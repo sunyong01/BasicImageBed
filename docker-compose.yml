@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  myapp:
+    image: alpine/java:21
+    container_name: BasicImageBed
+    environment:
+      - ENV_FILE=/app/.env
+    env_file:
+      - .env
+    volumes:
+      - ./:/app/
+    command: java -jar /app/app.jar
+    ports:
+      - "28123:8080"

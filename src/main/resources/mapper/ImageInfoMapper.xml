@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="web.sy.basicimagebed.mapper.ImageInfoMapper">
+
+    <resultMap id="ImageInfoResultMap" type="web.sy.basicimagebed.pojo.dao.ImageInfoDAO">
+        <id property="key" column="key"/>
+        <result property="name" column="name"/>
+        <result property="originName" column="origin_name"/>
+        <result property="pathname" column="pathname"/>
+        <result property="size" column="size"/>
+        <result property="width" column="width"/>
+        <result property="height" column="height"/>
+        <result property="md5" column="md5"/>
+        <result property="sha1" column="sha1"/>
+        <result property="date" column="date"/>
+        <result property="strategy" column="strategy"/>
+        <result property="isPublic" column="is_public"/>
+        <result property="uploadUser" column="upload_user"/>
+        <result property="albumId" column="album_id"/>
+    </resultMap>
+
+    <select id="getImageInfoByKey" resultMap="ImageInfoResultMap">
+        SELECT * FROM tb_image_info
+        WHERE `key` = #{key}
+    </select>
+
+    <select id="getAllImageByUser" resultMap="ImageInfoResultMap">
+        SELECT * FROM tb_image_info
+        WHERE upload_user = #{email}
+        <if test="is_public != null">
+            AND is_public = #{is_public}
+        </if>
+        <if test="album_id != null">
+            AND album_id = #{album_id}
+        </if>
+        <if test="keyword != null">
+            AND (origin_name LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="order != null">
+            ORDER BY ${order}
+        </if>
+        <if test="page != null and perPage != null">
+            LIMIT #{perPage} OFFSET ${(page - 1) * perPage}
+        </if>
+    </select>
+
+    <!-- 插入图片信息 -->
+    <insert id="insertImageInfo" parameterType="web.sy.basicimagebed.pojo.dao.ImageInfoDAO">
+        INSERT INTO tb_image_info (`key`, name, origin_name, pathname, size, width, height, md5, sha1, date, strategy, is_public, upload_user, album_id)
+        VALUES (#{key}, #{name}, #{originName}, #{pathname}, #{size}, #{width}, #{height}, #{md5}, #{sha1}, #{date}, #{strategy}, #{isPublic}, #{uploadUser}, #{albumId})
+    </insert>
+
+</mapper>
