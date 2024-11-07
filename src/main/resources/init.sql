@@ -1,4 +1,4 @@
-CREATE TABLE tb_image_info
+CREATE TABLE IF NOT EXISTS tb_image_info
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
     `key`       VARCHAR(255) NOT NULL UNIQUE COMMENT '图片唯一密钥',
@@ -17,14 +17,14 @@ CREATE TABLE tb_image_info
     album_id    INT          COMMENT '相册 ID'
 ) COMMENT ='图片信息表';
 
-CREATE TABLE tb_strategy
+CREATE TABLE IF NOT EXISTS tb_strategy
 (
     id          INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
     name        VARCHAR(255) NOT NULL COMMENT '策略名称',
     config_json json         NOT NULL COMMENT '策略配置 JSON'
 ) COMMENT ='存储策略表';
 
-CREATE TABLE tb_user
+CREATE TABLE IF NOT EXISTS tb_user
 (
     id       BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
     email    VARCHAR(255) NOT NULL COMMENT '用户邮箱',
@@ -37,14 +37,14 @@ CREATE TABLE tb_user
     capacity_used DOUBLE COMMENT '用户已用容量，单位 KB',
     role     INT          NOT NULL default 1 COMMENT '用户角色'
 ) COMMENT ='用户表';
-CREATE TABLE tb_user_token
+CREATE TABLE IF NOT EXISTS tb_user_token
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
     email       VARCHAR(255) NOT NULL COMMENT '用户ID',
     token       VARCHAR(255) NOT NULL COMMENT 'token'
 ) COMMENT ='用户 token 表';
 
-CREATE TABLE tb_albums
+CREATE TABLE IF NOT EXISTS tb_albums
 (
     id          INT AUTO_INCREMENT PRIMARY KEY COMMENT '相册自增 ID',
     name        VARCHAR(255) NOT NULL COMMENT '相册名称',
