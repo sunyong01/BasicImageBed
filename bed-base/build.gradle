@@ -1,0 +1,45 @@
+plugins {
+    id 'java-library'
+    id 'io.spring.dependency-management'
+}
+
+jar {
+    enabled = true
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // Spring 相关
+    api 'org.springframework:spring-context'
+    
+    // OpenAPI
+    api 'org.springdoc:springdoc-openapi-starter-webmvc-ui'
+    
+    // JWT 相关依赖
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // MySQL Driver
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    //caffeine
+    implementation 'com.github.ben-manes.caffeine:caffeine:2.9.0'
+
+    // MyBatis
+    api 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+
+    // Jackson
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.core:jackson-core'
+    
+    // Lombok
+    api 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    // 存储相关依赖
+    api 'org.dromara.x-file-storage:x-file-storage-core:2.2.1'
+} 

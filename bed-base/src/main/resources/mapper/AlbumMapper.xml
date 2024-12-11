@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="web.sy.bed.base.mapper.AlbumMapper">
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="web.sy.bed.base.pojo.entity.Album">
+        <id column="id" property="id" /><!-- 相册ID -->
+        <result column="name" property="name" /><!-- 相册名称 -->
+        <result column="description" property="description" /><!-- 相册描述 -->
+        <result column="is_public" property="isPublic" /><!-- 是否公开 -->
+        <result column="create_time" property="createTime" /><!-- 创建时间 -->
+        <result column="update_time" property="updateTime" /><!-- 更新时间 -->
+        <result column="username" property="username" /><!-- 创建者用户名 -->
+        <result column="image_count" property="imageCount" /><!-- 图片数量 -->
+        <result column="cover_url" property="coverUrl" /><!-- 相册封面URL -->
+    </resultMap>
+
+    <!-- 插入新相册 -->
+    <insert id="insertAlbum" parameterType="web.sy.bed.base.pojo.entity.Album" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_album (
+            name,           <!-- 相册名称 -->
+            description,    <!-- 相册描述 -->
+            cover_url,      <!-- 添加封面URL -->
+            is_public,      <!-- 是否公开 -->
+            create_time,    <!-- 创建时间 -->
+            update_time,    <!-- 更新时间 -->
+            username        <!-- 创建者用户名 -->
+        )
+        VALUES (
+            #{name},
+            #{description},
+            #{coverUrl},    <!-- 添加封面URL -->
+            #{isPublic},
+            NOW(),
+            NOW(),
+            #{username}
+        )
+    </insert>
+
+    <!-- 更新相册信息 -->
+    <update id="updateAlbum" parameterType="web.sy.bed.base.pojo.entity.Album">
+        UPDATE tb_album
+        SET name = #{name},                <!-- 更新相册名称 -->
+            description = #{description},   <!-- 更新相册描述 -->
+            cover_url = #{coverUrl},    <!-- 添加封面URL -->
+            is_public = #{isPublic},       <!-- 更新公开状态 -->
+            update_time = NOW()            <!-- 更新修改时间 -->
+        WHERE id = #{id} AND username = #{username}
+    </update>
+
+    <!-- 删除相册 -->
+    <delete id="deleteAlbum">
+        DELETE FROM tb_album WHERE id = #{id}
+    </delete>
+
+    <!-- 根据ID获取相册信息，包含图片数量 -->
+    <select id="getAlbumById" resultMap="BaseResultMap">
+        SELECT 
+            a.*,                           <!-- 相册基本信息 -->
+            COUNT(i.id) as image_count     <!-- 图片数量 -->
+        FROM tb_album a
+        LEFT JOIN tb_image_info i ON a.id = i.album_id
+        WHERE a.id = #{id}
+        GROUP BY a.id
+    </select>
+
+    <!-- 获取用户的相册列表，支持分页和搜索 -->
+    <select id="getAlbumList" resultMap="BaseResultMap">
+        SELECT 
+            a.*,                           <!-- 相册基本信息 -->
+            COUNT(i.id) as image_count     <!-- 图片数量 -->
+        FROM tb_album a
+        LEFT JOIN tb_image_info i ON a.id = i.album_id
+        WHERE a.username = #{username}
+        <if test="keyword != null and keyword != ''">
+            AND (
+                a.name LIKE CONCAT('%',#{keyword},'%')         <!--  按文件目名搜索 -->
+                OR a.description LIKE CONCAT('%',#{keyword},'%')<!-- 按描述搜索 -->
+            )
+        </if>
+        GROUP BY a.id
+        ORDER BY a.create_time DESC                            <!-- 按创建时间倒序 -->
+        <if test="offset != null and pageSize != null">
+            LIMIT #{pageSize} OFFSET #{offset}                 <!-- 分页 -->
+        </if>
+    </select>
+
+    <!-- 获取用户的相册总数 -->
+    <select id="countAlbums" resultType="int">
+        SELECT COUNT(*) FROM tb_album
+        WHERE username = #{username}
+        <if test="keyword != null and keyword != ''">
+            AND (
+                name LIKE CONCAT('%',#{keyword},'%')           <!-- 按名称搜索 -->
+                OR description LIKE CONCAT('%',#{keyword},'%')  <!-- 按描述搜索 -->
+            )
+        </if>
+    </select>
+
+    <!-- 检查相册名是否已存在 -->
+    <select id="checkAlbumNameExists" resultType="int">
+        SELECT COUNT(*) FROM tb_album
+        WHERE username = #{username} AND name = #{name}
+    </select>
+
+    <!-- 条件搜索相册 -->
+    <select id="searchAlbums" resultMap="BaseResultMap">
+        SELECT * FROM tb_album
+        <where>
+            <if test="condition.username != null and condition.username != ''">
+                AND username = #{condition.username}
+            </if>
+            <if test="condition.name != null and condition.name != ''">
+                AND name LIKE CONCAT('%', #{condition.name}, '%')
+            </if>
+            <if test="condition.description != null and condition.description != ''">
+                AND description LIKE CONCAT('%', #{condition.description}, '%')
+            </if>
+            <if test="condition.isPublic != null">
+                AND is_public = #{condition.isPublic}
+            </if>
+        </where>
+        <choose>
+            <when test="order != null and order == 'asc'">
+                ORDER BY create_time ASC
+            </when>
+            <otherwise>
+                ORDER BY create_time DESC
+            </otherwise>
+        </choose>
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 统计符合条件的相册数量 -->
+    <select id="countSearchAlbums" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM tb_album
+        <where>
+            <if test="condition.username != null and condition.username != ''">
+                AND username = #{condition.username}
+            </if>
+            <if test="condition.name != null and condition.name != ''">
+                AND name LIKE CONCAT('%', #{condition.name}, '%')
+            </if>
+            <if test="condition.description != null and condition.description != ''">
+                AND description LIKE CONCAT('%', #{condition.description}, '%')
+            </if>
+            <if test="condition.isPublic != null">
+                AND is_public = #{condition.isPublic}
+            </if>
+        </where>
+    </select>
+
+    <select id="countAllAlbums" resultType="long">
+        SELECT COUNT(*) FROM tb_album
+    </select>
+</mapper> 

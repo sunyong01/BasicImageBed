@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="web.sy.bed.base.mapper.ImageInfoMapper">
+
+    <resultMap id="BaseResultMap" type="web.sy.bed.base.pojo.entity.ImageInfo">
+        <id column="id" property="id"/>
+        <result column="key" property="key"/>
+        <result column="name" property="name"/>
+        <result column="origin_name" property="originName"/>
+        <result column="pathname" property="pathname"/>
+        <result column="size" property="size"/>
+        <result column="width" property="width"/>
+        <result column="height" property="height"/>
+        <result column="md5" property="md5"/>
+        <result column="sha1" property="sha1"/>
+        <result column="date" property="date"/>
+        <result column="strategy" property="strategy"/>
+        <result column="is_public" property="isPublic"/>
+        <result column="upload_user" property="uploadUser"/>
+        <result column="album_id" property="albumId"/>
+    </resultMap>
+
+    <select id="getImageInfoByKey" resultMap="BaseResultMap">
+        SELECT * FROM tb_image_info
+        WHERE `key` = #{key}
+    </select>
+
+    <select id="getAllImageByUser" resultMap="BaseResultMap">
+        SELECT * FROM tb_image_info 
+        WHERE upload_user = #{username}
+        <if test="keyword != null and keyword != ''">
+            AND (origin_name LIKE CONCAT('%',#{keyword},'%') OR `key` LIKE CONCAT('%',#{keyword},'%'))
+        </if>
+        <if test="is_public != null">
+            AND is_public = #{is_public}
+        </if>
+        <if test="album_id != null">
+            AND album_id = #{album_id}
+        </if>
+        <choose>
+            <when test="order != null and order == 'asc'">
+                ORDER BY date
+            </when>
+            <otherwise>
+                ORDER BY date DESC
+            </otherwise>
+        </choose>
+        <if test="offset != null and perPage != null">
+            LIMIT #{perPage} OFFSET #{offset}
+        </if>
+    </select>
+    <!-- 插入图片信息 -->
+    <insert id="insertImageInfo" parameterType="web.sy.bed.base.pojo.entity.ImageInfo">
+        INSERT INTO tb_image_info (`key`, name, origin_name, pathname, size, width, height, md5, sha1, date, strategy, is_public, upload_user, album_id)
+        VALUES (#{key}, #{name}, #{originName}, #{pathname}, #{size}, #{width}, #{height}, #{md5}, #{sha1}, #{date}, #{strategy}, #{isPublic}, #{uploadUser}, #{albumId})
+    </insert>
+<select id="countAllImageByUser" resultMap="BaseResultMap">
+    SELECT COUNT(*) FROM tb_image_info
+    WHERE upload_user = #{username}
+</select>
+    <!-- 根据key获取图片信息 -->
+    <select id="getImageByKey" resultMap="BaseResultMap">
+        SELECT *
+        FROM tb_image_info
+        WHERE `key` = #{key}
+    </select>
+
+    <!-- 更新图片信息 -->
+    <update id="updateImage" parameterType="web.sy.bed.base.pojo.entity.ImageInfo">
+        UPDATE tb_image_info
+        SET album_id = #{albumId}
+        <if test="isPublic != null">
+            , is_public = #{isPublic}
+        </if>
+        WHERE `key` = #{key}
+    </update>
+
+    <!-- 条件搜索图片 -->
+    <select id="searchImages" resultMap="BaseResultMap">
+        SELECT * FROM tb_image_info
+        <where>
+            <if test="condition.uploadUser != null and condition.uploadUser != ''">
+                AND upload_user = #{condition.uploadUser}
+            </if>
+            <if test="condition.albumId != null">
+                AND album_id = #{condition.albumId}
+            </if>
+            <if test="condition.isPublic != null">
+                AND is_public = #{condition.isPublic}
+            </if>
+            <if test="condition.key != null and condition.key != ''">
+                AND `key` LIKE CONCAT('%', #{condition.key}, '%')
+            </if>
+            <if test="condition.originName != null and condition.originName != ''">
+                AND origin_name LIKE CONCAT('%', #{condition.originName}, '%')
+            </if>
+        </where>
+        <choose>
+            <when test="order != null and order == 'asc'">
+                ORDER BY date ASC
+            </when>
+            <otherwise>
+                ORDER BY date DESC
+            </otherwise>
+        </choose>
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 统计符合条件的图片数量 -->
+    <select id="countSearchImages" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM tb_image_info
+        <where>
+            <if test="condition.uploadUser != null and condition.uploadUser != ''">
+                AND upload_user = #{condition.uploadUser}
+            </if>
+            <if test="condition.albumId != null">
+                AND album_id = #{condition.albumId}
+            </if>
+            <if test="condition.isPublic != null">
+                AND is_public = #{condition.isPublic}
+            </if>
+            <if test="condition.key != null and condition.key != ''">
+                AND `key` LIKE CONCAT('%', #{condition.key}, '%')
+            </if>
+            <if test="condition.originName != null and condition.originName != ''">
+                AND origin_name LIKE CONCAT('%', #{condition.originName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 统计相册中的图片数量 -->
+    <select id="countImagesByAlbumId" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM tb_image_info
+        WHERE album_id = #{albumId}
+    </select>
+
+    <select id="countImagesByUserId" resultType="long">
+        SELECT COUNT(*)
+        FROM tb_image_info
+        WHERE upload_user = (
+            SELECT username 
+            FROM tb_user 
+            WHERE id = #{userId}
+        )
+    </select>
+
+    <select id="getImageTypeDistribution" resultType="java.util.Map">
+        SELECT 
+            extension as `key`,
+            COUNT(*) as `value`
+        FROM (
+            SELECT SUBSTRING(name, INSTR(name, '.') + 1) as extension
+            FROM tb_image_info
+            WHERE upload_user = (
+                SELECT username 
+                FROM tb_user 
+                WHERE id = #{userId}
+            )
+        ) t
+        GROUP BY extension
+    </select>
+
+    <select id="countAllImages" resultType="long">
+        SELECT COUNT(*) FROM tb_image_info
+    </select>
+
+    <delete id="deleteImagesByUserId">
+        DELETE FROM tb_image_info
+        WHERE upload_user = (SELECT username FROM tb_user WHERE id = #{userId})
+    </delete>
+</mapper>

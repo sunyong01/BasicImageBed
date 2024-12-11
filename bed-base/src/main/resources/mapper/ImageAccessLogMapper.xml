@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="web.sy.bed.base.mapper.ImageAccessLogMapper">
+    <resultMap id="BaseResultMap" type="web.sy.bed.base.pojo.entity.ImageAccessLog">
+        <id column="id" property="id"/>
+        <result column="pathname" property="pathname"/>
+        <result column="user_id" property="userId"/>
+        <result column="file_size" property="fileSize"/>
+        <result column="operation_type" property="operationType"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <!-- 插入访问日志 -->
+    <insert id="insert" parameterType="web.sy.bed.base.pojo.entity.ImageAccessLog">
+        INSERT INTO tb_image_access_log (
+            pathname,
+            user_id,
+            file_size,
+            operation_type,
+            create_time
+        ) VALUES (
+            #{pathname},
+            #{userId},
+            #{fileSize},
+            #{operationType},
+            #{createTime}
+        )
+    </insert>
+
+    <!-- 获取用户的访问日志 -->
+    <select id="getLogsByUserId" resultMap="BaseResultMap">
+        SELECT * FROM tb_image_access_log
+        WHERE user_id = #{userId}
+        ORDER BY create_time DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 统计用户的访问日志数量 -->
+    <select id="countLogsByUserId" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM tb_image_access_log
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="getUploadStats" resultType="java.util.Map">
+        SELECT 
+            COUNT(CASE WHEN operation_type = 'UPLOAD' THEN 1 END) as originalTotalCount,
+            COUNT(CASE WHEN operation_type = 'THUMBNAIL_UPLOAD' THEN 1 END) as thumbnailTotalCount,
+            COALESCE(SUM(file_size), 0) as totalSize,
+            COALESCE(AVG(file_size), 0) as averageSize
+        FROM tb_image_access_log
+        WHERE user_id = #{userId}
+        AND operation_type IN ('UPLOAD', 'THUMBNAIL_UPLOAD')
+        <if test="startTime != null">
+            AND create_time >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND create_time &lt;= #{endTime}
+        </if>
+    </select>
+
+    <select id="getDownloadStats" resultType="java.util.Map">
+        SELECT 
+            COUNT(CASE WHEN operation_type = 'DOWNLOAD' THEN 1 END) as originalTotalCount,
+            COUNT(CASE WHEN operation_type = 'THUMBNAIL_DOWNLOAD' THEN 1 END) as thumbnailTotalCount,
+            COALESCE(SUM(file_size), 0) as totalTraffic,
+            COALESCE(AVG(file_size), 0) as averageSize
+        FROM tb_image_access_log
+        WHERE user_id = #{userId}
+        AND operation_type IN ('DOWNLOAD', 'THUMBNAIL_DOWNLOAD')
+        <if test="startTime != null">
+            AND create_time >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND create_time &lt;= #{endTime}
+        </if>
+    </select>
+
+    <select id="countTotalAccess" resultType="long">
+        SELECT COUNT(*)
+        FROM tb_image_access_log
+        <where>
+            <if test="userId != null">
+                user_id = #{userId}
+            </if>
+        </where>
+    </select>
+
+    <!-- 获取每天统计数据 -->
+    <select id="getDailyStats" resultType="java.util.Map">
+        SELECT 
+            DATE_FORMAT(create_time, '%Y-%m-%d') as date,
+            COUNT(CASE WHEN operation_type = 'UPLOAD' THEN 1 END) as originalUploadCount,
+            COUNT(CASE WHEN operation_type = 'THUMBNAIL_UPLOAD' THEN 1 END) as thumbnailUploadCount,
+            COUNT(CASE WHEN operation_type = 'DOWNLOAD' THEN 1 END) as originalDownloadCount,
+            COUNT(CASE WHEN operation_type = 'THUMBNAIL_DOWNLOAD' THEN 1 END) as thumbnailDownloadCount
+        FROM tb_image_access_log
+        WHERE user_id = #{userId}
+        <if test="startTime != null">
+            AND create_time >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND create_time &lt;= #{endTime}
+        </if>
+        GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d')
+        ORDER BY date ASC
+    </select>
+
+    <select id="getRangeStats" resultType="java.util.Map">
+        SELECT 
+            DATE(create_time) as date,
+            SUM(CASE WHEN operation_type = 'UPLOAD' THEN 1 ELSE 0 END) as upload_count,
+            SUM(CASE WHEN operation_type = 'UPLOAD' THEN file_size ELSE 0 END) as upload_traffic,
+            SUM(CASE WHEN operation_type = 'DOWNLOAD' THEN 1 ELSE 0 END) as download_count,
+            SUM(CASE WHEN operation_type = 'DOWNLOAD' THEN file_size ELSE 0 END) as download_traffic
+        FROM tb_image_access_log
+        WHERE DATE(create_time) BETWEEN #{startDate} AND #{endDate}
+        GROUP BY DATE(create_time)
+        ORDER BY date
+    </select>
+
+<select id="getTopDownloadedImages" resultType="java.util.Map">
+    SELECT 
+        i.origin_name COLLATE utf8mb4_general_ci as originName,
+        COUNT(CASE WHEN al.operation_type = 'DOWNLOAD' THEN 1 END) as originalDownloadCount,
+        COUNT(CASE WHEN al.operation_type = 'THUMBNAIL_DOWNLOAD' THEN 1 END) as thumbnailDownloadCount
+    FROM tb_image_access_log al
+    JOIN tb_image_info i ON al.pathname COLLATE utf8mb4_general_ci = i.pathname
+    <where>
+        <if test="userId != null">
+            al.user_id = #{userId}
+            AND al.operation_type IN ('DOWNLOAD', 'THUMBNAIL_DOWNLOAD')
+        </if>
+        <if test="userId == null">
+            al.operation_type IN ('DOWNLOAD', 'THUMBNAIL_DOWNLOAD')
+        </if>
+    </where>
+    GROUP BY i.origin_name
+    ORDER BY (COUNT(CASE WHEN al.operation_type = 'DOWNLOAD' THEN 1 END) +
+             COUNT(CASE WHEN al.operation_type = 'THUMBNAIL_DOWNLOAD' THEN 1 END)) DESC
+    LIMIT #{limit}
+</select>
+
+
+    <select id="getTopTrafficImages" resultType="java.util.Map">
+        SELECT
+            i.origin_name COLLATE utf8mb4_general_ci as originName,
+            COUNT(CASE WHEN l.operation_type = 'DOWNLOAD' THEN 1 END) as originalDownloadCount,
+            COUNT(CASE WHEN l.operation_type = 'THUMBNAIL_DOWNLOAD' THEN 1 END) as thumbnailDownloadCount,
+            SUM(CASE WHEN l.operation_type = 'DOWNLOAD' THEN l.file_size ELSE 0 END) as originalTraffic,
+            SUM(CASE WHEN l.operation_type = 'THUMBNAIL_DOWNLOAD' THEN l.file_size ELSE 0 END) as thumbnailTraffic,
+            SUM(l.file_size) as totalTraffic
+        FROM tb_image_access_log l
+                 JOIN tb_image_info i ON l.pathname COLLATE utf8mb4_general_ci = i.pathname
+        WHERE l.operation_type IN ('DOWNLOAD', 'THUMBNAIL_DOWNLOAD')
+        GROUP BY i.origin_name
+        ORDER BY totalTraffic DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 获取最近下载的图片 -->
+<select id="getRecentDownloadedImages" resultType="java.util.Map">
+    SELECT 
+        i.origin_name COLLATE utf8mb4_general_ci as originName,
+        al.create_time as downloadTime,
+        CASE WHEN al.operation_type = 'THUMBNAIL_DOWNLOAD' THEN 1 ELSE 0 END as isThumbnail
+    FROM tb_image_access_log al
+    JOIN tb_image_info i ON al.pathname COLLATE utf8mb4_general_ci = i.pathname
+    <where>
+        <if test="userId != null">
+            al.user_id = #{userId}
+            AND al.operation_type IN ('DOWNLOAD', 'THUMBNAIL_DOWNLOAD')
+        </if>
+        <if test="userId == null">
+            al.operation_type IN ('DOWNLOAD', 'THUMBNAIL_DOWNLOAD')
+        </if>
+    </where>
+    ORDER BY al.create_time DESC
+    LIMIT #{limit}
+</select>
+
+    <!-- 获取指定日期的管理员统计数据 -->
+    <select id="getAdminDailyStats" resultType="java.util.Map">
+        SELECT 
+            SUM(CASE WHEN operation_type = 'UPLOAD' THEN 1 ELSE 0 END) as upload_count,
+            SUM(CASE WHEN operation_type = 'UPLOAD' THEN file_size ELSE 0 END) as upload_traffic,
+            SUM(CASE WHEN operation_type = 'DOWNLOAD' THEN 1 ELSE 0 END) as download_count,
+            SUM(CASE WHEN operation_type = 'DOWNLOAD' THEN file_size ELSE 0 END) as download_traffic
+        FROM tb_image_access_log
+        WHERE DATE(create_time) = #{date}
+    </select>
+
+    <!-- 获取图片数量排行 -->
+    <select id="getImageCountRanking" resultType="java.util.Map">
+        SELECT 
+            u.username,
+            up.nickname,
+            COUNT(*) as value
+        FROM tb_image_info i
+        JOIN tb_user u ON i.upload_user = u.username
+        LEFT JOIN tb_user_profile up ON u.id = up.user_id
+        GROUP BY u.username, up.nickname
+        ORDER BY value DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 获取流量排行 -->
+    <select id="getTrafficRanking" resultType="java.util.Map">
+        SELECT 
+            u.username,
+            up.nickname,
+            SUM(l.file_size) as value
+        FROM tb_image_access_log l
+        JOIN tb_user u ON l.user_id = u.id
+        LEFT JOIN tb_user_profile up ON u.id = up.user_id
+        WHERE l.operation_type = 'DOWNLOAD'
+        GROUP BY u.username, up.nickname
+        ORDER BY value DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 获取存储空间排行 -->
+    <select id="getStorageRanking" resultType="java.util.Map">
+        SELECT 
+            u.username,
+            up.nickname,
+            up.capacity_used as value
+        FROM tb_user u
+        JOIN tb_user_profile up ON u.id = up.user_id
+        ORDER BY value DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 获取下载次数排行 -->
+    <select id="getDownloadCountRanking" resultType="java.util.Map">
+        SELECT 
+            u.username,
+            up.nickname,
+            COUNT(*) as value
+        FROM tb_image_access_log l
+        JOIN tb_user u ON l.user_id = u.id
+        LEFT JOIN tb_user_profile up ON u.id = up.user_id
+        WHERE l.operation_type = 'DOWNLOAD'
+        GROUP BY u.username, up.nickname
+        ORDER BY value DESC
+        LIMIT #{limit}
+    </select>
+</mapper> 
