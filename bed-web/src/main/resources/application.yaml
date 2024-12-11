@@ -1,0 +1,30 @@
+server:
+  port: 8080
+
+spring:
+  sql:
+    init:
+      mode: never
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+      - org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration
+  devtools:
+    restart:
+      enabled: true  # 启用热重启
+      additional-paths: # 额外监控的路径
+        - ../bed-base/src/main/java 
+        - src/main/java
+      livereload:
+        enabled: true
+      exclude: static/**,public/**  # 排除不需要监控的文件
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+  cache:
+    disabled: false

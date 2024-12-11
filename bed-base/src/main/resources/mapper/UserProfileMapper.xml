@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="web.sy.bed.base.mapper.UserProfileMapper">
+    
+    <resultMap id="userProfileResultMap" type="web.sy.bed.base.pojo.entity.UserProfile">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="email" column="email"/>
+        <result property="nickname" column="nickname"/>
+        <result property="url" column="url"/>
+        <result property="avatar" column="avatar"/>
+        <result property="registerIp" column="register_ip"/>
+        <result property="capacity" column="capacity"/>
+        <result property="capacityUsed" column="capacity_used"/>
+    </resultMap>
+
+    <select id="findByUserId" resultMap="userProfileResultMap">
+        SELECT * FROM tb_user_profile WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insert" parameterType="web.sy.bed.base.pojo.entity.UserProfile">
+        INSERT INTO tb_user_profile (
+            user_id, email, nickname, url, avatar, 
+            register_ip, capacity, capacity_used
+        ) VALUES (
+            #{userId}, #{email}, #{nickname}, #{url}, #{avatar}, 
+            #{registerIp}, #{capacity}, #{capacityUsed}
+        )
+    </insert>
+
+    <update id="update" parameterType="web.sy.bed.base.pojo.entity.UserProfile">
+        UPDATE tb_user_profile
+        <set>
+            <if test="email != null">email = #{email},</if>
+            <if test="nickname != null">nickname = #{nickname},</if>
+            <if test="url != null">url = #{url},</if>
+            <if test="avatar != null">avatar = #{avatar}</if>
+        </set>
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="updateEmail">
+        UPDATE tb_user_profile 
+        SET email = #{email} 
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="updateAvatar">
+        UPDATE tb_user_profile 
+        SET avatar = #{avatarUrl} 
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="updateCapacityUsed">
+        UPDATE tb_user_profile 
+        SET capacity_used = #{capacityUsed} 
+        WHERE user_id = #{userId}
+    </update>
+
+    <select id="existsByEmail" resultType="boolean">
+        SELECT COUNT(*) > 0 
+        FROM tb_user_profile 
+        WHERE email = #{email}
+    </select>
+
+    <select id="findAll" resultMap="userProfileResultMap">
+        SELECT * FROM tb_user_profile
+    </select>
+
+    <update id="updateCapacity">
+        UPDATE tb_user_profile 
+        SET capacity = #{capacity}
+        WHERE user_id = #{userId}
+    </update>
+
+    <select id="findByEmail" resultMap="userProfileResultMap">
+        SELECT * FROM tb_user_profile 
+        WHERE email = #{email}
+    </select>
+</mapper> 

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="web.sy.bed.base.mapper.UserTokenMapper">
+    
+    <resultMap id="BaseResultMap" type="web.sy.bed.base.pojo.entity.UserToken">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="token" property="token"/>
+        <result column="token_name" property="tokenName"/>
+        <result column="token_id" property="tokenId"/>
+        <result column="enabled" property="enabled"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="web.sy.bed.base.pojo.entity.UserToken" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_user_token (user_id, token, token_name, token_id, enabled)
+        VALUES (#{userId}, #{token}, #{tokenName}, #{tokenId}, #{enabled})
+    </insert>
+
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT * FROM tb_user_token WHERE id = #{id}
+    </select>
+
+    <select id="getByUserId" resultMap="BaseResultMap">
+        SELECT * FROM tb_user_token WHERE user_id = #{userId}
+    </select>
+
+    <select id="getByToken" resultMap="BaseResultMap">
+        SELECT * FROM tb_user_token WHERE token = #{token}
+    </select>
+
+    <update id="updateEnabled">
+        UPDATE tb_user_token SET enabled = #{enabled} WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM tb_user_token WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByUserId">
+        DELETE FROM tb_user_token WHERE user_id = #{userId}
+    </delete>
+
+    <select id="getNextTokenId" resultType="java.lang.Integer">
+        SELECT COALESCE(MAX(token_id) + 1, 1)
+        FROM tb_user_token
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="findByIdAndToken" resultMap="BaseResultMap">
+        SELECT 
+            id,
+            user_id,
+            token,
+            token_name,
+            token_id,
+            enabled
+        FROM tb_user_token
+        WHERE token_id = #{tokenId} AND token = #{token}
+    </select>
+</mapper>

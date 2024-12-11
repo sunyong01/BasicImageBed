@@ -1,35 +1,64 @@
-name: Build JAR
+name: Build x64
 
 on:
   push:
-    branches:
-      - master
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: '9.15.0'
+        
+    - name: Install pnpm dependencies
+      run: |
+        cd ui
+        pnpm install
+        
+    - name: Build with Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: build
+        
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: BasicImageBed
+        path: bed-web/build/libs/bed-web-*.jar
+        if-no-files-found: error
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v3
-        with:
-          java-version: '21'
-          distribution: 'temurin'
+    - name: Generate release tag
+      id: tag
+      run: |
+        echo "::set-output name=release_tag::release_$(date +"%Y.%m.%d_%H-%M")"
 
-      - name: Cache Maven packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-      - name: Build with Maven
-        run: mvn clean package -DskipTests
-
-      - name: Upload JAR artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: basic_image_bed_jar
-          path: target/BasicImageBed-0.0.1-SNAPSHOT.jar
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: github.ref == 'refs/heads/main'
+      with:
+        files: bed-web/build/libs/bed-web-*.jar
+        tag_name: ${{ steps.tag.outputs.release_tag }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

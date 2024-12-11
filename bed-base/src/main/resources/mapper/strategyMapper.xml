@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="web.sy.bed.base.mapper.StrategyMapper">
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="web.sy.bed.base.pojo.entity.StrategyConfig">
+        <id column="id" property="id"/>
+        <result column="strategy_type" property="strategyType"
+                javaType="web.sy.bed.base.pojo.enums.Strategy"/>
+        <result column="config_json" property="configJson" 
+                typeHandler="web.sy.bed.base.handler.JsonTypeHandler"/>
+        <result column="max_capacity" property="maxCapacity"/>
+        <result column="used_capacity" property="usedCapacity"/>
+        <result column="strategy_name" property="strategyName"/>
+        <result column="available" property="available"/>
+        <result column="sort_order" property="sortOrder"/>
+    </resultMap>
+
+    <!-- 插入存储策略配置 -->
+    <insert id="insert" parameterType="web.sy.bed.base.pojo.entity.StrategyConfig" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_strategy (
+            strategy_type,
+            config_json,
+            max_capacity,
+            used_capacity,
+            strategy_name,
+            available,
+            sort_order
+        ) VALUES (
+            #{strategyType},
+            #{configJson,typeHandler=web.sy.bed.base.handler.JsonTypeHandler},
+            #{maxCapacity},
+            #{usedCapacity},
+            #{strategyName},
+            #{available},
+            #{sortOrder}
+        )
+    </insert>
+
+    <!-- 更新存储策略配置 -->
+    <update id="update" parameterType="web.sy.bed.base.pojo.entity.StrategyConfig">
+        UPDATE tb_strategy
+        <set>
+            <if test="configJson != null">config_json = #{configJson,typeHandler=web.sy.bed.base.handler.JsonTypeHandler},</if>
+            <if test="maxCapacity != null">max_capacity = #{maxCapacity},</if>
+            <if test="usedCapacity != null">used_capacity = #{usedCapacity},</if>
+            <if test="strategyName != null">strategy_name = #{strategyName},</if>
+            <if test="available != null">available = #{available},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据ID获取策略配置 -->
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT * FROM tb_strategy WHERE id = #{id}
+    </select>
+
+    <!-- 根据策略类型获取配置 -->
+    <select id="getByType" resultMap="BaseResultMap">
+        SELECT * FROM tb_strategy 
+        WHERE strategy_type = #{strategyType}
+    </select>
+
+    <!-- 获取所有策略配置 -->
+    <select id="getAll" resultMap="BaseResultMap">
+        SELECT * FROM tb_strategy
+    </select>
+
+    <!-- 删除策略配置 -->
+    <delete id="delete">
+        DELETE FROM tb_strategy WHERE id = #{id}
+    </delete>
+
+    <!-- 获取可用的策略列表 -->
+    <select id="getAvailable" resultMap="BaseResultMap">
+        SELECT * FROM tb_strategy
+        WHERE available = true
+        ORDER BY sort_order ASC
+    </select>
+
+    <!-- 更新策略可用状态 -->
+    <update id="updateAvailable">
+        UPDATE tb_strategy
+        SET available = #{available}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateUsedCapacity">
+        UPDATE tb_strategy
+        SET used_capacity = used_capacity + #{sizeChangeKb}
+        WHERE id = #{id}
+    </update>
+</mapper>

@@ -1,0 +1,90 @@
+plugins {
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+}
+
+bootJar {
+    enabled = true
+    archiveClassifier = ''
+    mainClass = 'web.sy.bed.BasicImageBedApplication'
+    
+    // 确保包含静态资源
+    from("${projectDir}/src/main/resources/static") {
+        into 'BOOT-INF/classes/static'
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE  // 处理重复文件
+    }
+    
+    // 依赖前端构建
+    dependsOn rootProject.tasks.named('frontendBuild')
+}
+
+jar {
+    enabled = false
+}
+
+// 确保processResources任务在前端构建之后执行
+processResources {
+    dependsOn rootProject.tasks.named('frontendBuild')
+    
+    // 确保静态资源被正确复制
+    from("${projectDir}/src/main/resources") {
+        include 'static/**'
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE  // 处理重复文件
+    }
+}
+
+dependencies {
+    implementation project(':bed-base')
+    implementation project(':bed-storage')
+    
+    // Spring Boot 基础依赖
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    
+    // Swagger/OpenAPI
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui'
+
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    
+    // Jackson
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    
+    // Jakarta
+    implementation 'jakarta.servlet:jakarta.servlet-api'
+    
+    // 缩略图处理
+    implementation 'net.coobird:thumbnailator:0.4.20'
+    
+    // SQLite JDBC
+    implementation 'org.xerial:sqlite-jdbc:3.44.1.0'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+    implementation 'org.springframework:spring-tx'
+
+
+    // Test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+}
+
+bootRun {
+    jvmArgs = ['-Dspring.profiles.active=dev']
+    sourceResources sourceSets.main
+}
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+}

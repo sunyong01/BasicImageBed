@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="web.sy.bed.base.mapper.UserMapper">
+    
+    <resultMap id="userResultMap" type="web.sy.bed.base.pojo.entity.User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="enabled" column="enabled"/>
+        <result property="accountNonExpired" column="account_non_expired"/>
+        <result property="credentialsNonExpired" column="credentials_non_expired"/>
+        <result property="accountNonLocked" column="account_non_locked"/>
+        <result property="createTime" column="create_time"/>
+        <result property="lastLoginTime" column="last_login_time"/>
+        <!-- 关联角色集合 -->
+        <collection property="roles" ofType="web.sy.bed.base.pojo.entity.Role">
+            <id property="id" column="role_id"/>
+            <result property="roleName" column="role_name"/>
+            <result property="roleCode" column="role_code"/>
+            <result property="description" column="role_description"/>
+        </collection>
+        <!-- 关联权限集合 -->
+        <collection property="permissions" ofType="web.sy.bed.base.pojo.entity.Permission">
+            <id property="id" column="permission_id"/>
+            <result property="permissionName" column="permission_name"/>
+            <result property="permissionCode" column="permission_code"/>
+            <result property="description" column="permission_description"/>
+        </collection>
+    </resultMap>
+
+    <select id="findByUsername" resultMap="userResultMap">
+        SELECT 
+            u.*,
+            r.id as role_id,
+            r.role_name,
+            r.role_code,
+            r.description as role_description,
+            p.id as permission_id,
+            p.permission_name,
+            p.permission_code,
+            p.description as permission_description
+        FROM tb_user u
+        LEFT JOIN tb_user_role ur ON u.id = ur.user_id
+        LEFT JOIN tb_role r ON ur.role_id = r.id
+        LEFT JOIN tb_role_permission rp ON r.id = rp.role_id
+        LEFT JOIN tb_permission p ON rp.permission_id = p.id
+        WHERE u.username = #{username}
+    </select>
+
+    <select id="findByEmail" resultMap="userResultMap">
+        SELECT 
+            u.*,
+            r.id as role_id,
+            r.role_name,
+            r.role_code,
+            r.description as role_description,
+            p.id as permission_id,
+            p.permission_name,
+            p.permission_code,
+            p.description as permission_description
+        FROM tb_user u
+        LEFT JOIN tb_user_profile up ON u.id = up.user_id
+        LEFT JOIN tb_user_role ur ON u.id = ur.user_id
+        LEFT JOIN tb_role r ON ur.role_id = r.id
+        LEFT JOIN tb_role_permission rp ON r.id = rp.role_id
+        LEFT JOIN tb_permission p ON rp.permission_id = p.id
+        WHERE up.email = #{email}
+    </select>
+
+    <insert id="insert" parameterType="web.sy.bed.base.pojo.entity.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_user (
+            username, password, enabled, account_non_expired,
+            credentials_non_expired, account_non_locked, create_time
+        ) VALUES (
+            #{username}, #{password}, #{enabled}, #{accountNonExpired},
+            #{credentialsNonExpired}, #{accountNonLocked}, #{createTime}
+        )
+    </insert>
+
+    <update id="update" parameterType="web.sy.bed.base.pojo.entity.User">
+        UPDATE tb_user
+        <set>
+            <if test="password != null">password = #{password},</if>
+            <if test="enabled != null">enabled = #{enabled},</if>
+            <if test="accountNonExpired != null">account_non_expired = #{accountNonExpired},</if>
+            <if test="credentialsNonExpired != null">credentials_non_expired = #{credentialsNonExpired},</if>
+            <if test="accountNonLocked != null">account_non_locked = #{accountNonLocked},</if>
+            <if test="lastLoginTime != null">last_login_time = #{lastLoginTime}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updatePassword">
+        UPDATE tb_user 
+        SET password = #{password}
+        WHERE id = #{userId}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM tb_user WHERE id = #{id}
+    </delete>
+
+    <update id="updateStatus">
+        UPDATE tb_user 
+        SET enabled = #{enabled}
+        WHERE id = #{userId}
+    </update>
+
+    <update id="updateLastLoginTime">
+        UPDATE tb_user 
+        SET last_login_time = CURRENT_TIMESTAMP
+        WHERE username = #{username}
+    </update>
+
+    <select id="existsByUsername" resultType="boolean">
+        SELECT COUNT(*) > 0 
+        FROM tb_user 
+        WHERE username = #{username}
+    </select>
+
+    <select id="findById" resultMap="userResultMap">
+        SELECT 
+            u.*,
+            r.id as role_id,
+            r.role_name,
+            r.role_code,
+            r.description as role_description,
+            p.id as permission_id,
+            p.permission_name,
+            p.permission_code,
+            p.description as permission_description
+        FROM tb_user u
+        LEFT JOIN tb_user_role ur ON u.id = ur.user_id
+        LEFT JOIN tb_role r ON ur.role_id = r.id
+        LEFT JOIN tb_role_permission rp ON r.id = rp.role_id
+        LEFT JOIN tb_permission p ON rp.permission_id = p.id
+        WHERE u.id = #{id}
+    </select>
+
+    <!-- 条件搜索用户 -->
+    <select id="searchUsers" resultMap="userResultMap">
+        SELECT 
+            u.*,
+            r.id as role_id,
+            r.role_name,
+            r.role_code,
+            r.description as role_description,
+            p.id as permission_id,
+            p.permission_name,
+            p.permission_code,
+            p.description as permission_description
+        FROM (
+            SELECT DISTINCT u.* 
+            FROM tb_user u
+            LEFT JOIN tb_user_profile up ON u.id = up.user_id
+            <where>
+                <if test="condition.id != null">
+                    AND u.id = #{condition.id}
+                </if>
+                <if test="condition.username != null and condition.username != ''">
+                    AND u.username LIKE CONCAT('%', #{condition.username}, '%')
+                </if>
+                <if test="condition.email != null and condition.email != ''">
+                    AND up.email LIKE CONCAT('%', #{condition.email}, '%')
+                </if>
+                <if test="condition.enabled != null">
+                    AND u.enabled = #{condition.enabled}
+                </if>
+                <if test="condition.accountNonExpired != null">
+                    AND u.account_non_expired = #{condition.accountNonExpired}
+                </if>
+                <if test="condition.credentialsNonExpired != null">
+                    AND u.credentials_non_expired = #{condition.credentialsNonExpired}
+                </if>
+                <if test="condition.accountNonLocked != null">
+                    AND u.account_non_locked = #{condition.accountNonLocked}
+                </if>
+                <if test="condition.createTimeStart != null">
+                    AND u.create_time >= #{condition.createTimeStart}
+                </if>
+                <if test="condition.createTimeEnd != null">
+                    AND u.create_time &lt;= #{condition.createTimeEnd}
+                </if>
+                <if test="condition.lastLoginTimeStart != null">
+                    AND u.last_login_time >= #{condition.lastLoginTimeStart}
+                </if>
+                <if test="condition.lastLoginTimeEnd != null">
+                    AND u.last_login_time &lt;= #{condition.lastLoginTimeEnd}
+                </if>
+            </where>
+            ORDER BY u.create_time DESC
+            LIMIT #{offset}, #{pageSize}
+        ) u
+        LEFT JOIN tb_user_role ur ON u.id = ur.user_id
+        LEFT JOIN tb_role r ON ur.role_id = r.id
+        LEFT JOIN tb_role_permission rp ON r.id = rp.role_id
+        LEFT JOIN tb_permission p ON rp.permission_id = p.id
+        ORDER BY u.create_time DESC
+    </select>
+
+    <!-- 统计符合条件的用户数量 -->
+    <select id="countSearchUsers" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT u.id) 
+        FROM tb_user u
+        LEFT JOIN tb_user_profile up ON u.id = up.user_id
+        <where>
+            <if test="condition.id != null">
+                AND u.id = #{condition.id}
+            </if>
+            <if test="condition.username != null and condition.username != ''">
+                AND u.username LIKE CONCAT('%', #{condition.username}, '%')
+            </if>
+            <if test="condition.email != null and condition.email != ''">
+                AND up.email LIKE CONCAT('%', #{condition.email}, '%')
+            </if>
+            <if test="condition.enabled != null">
+                AND u.enabled = #{condition.enabled}
+            </if>
+            <if test="condition.accountNonExpired != null">
+                AND u.account_non_expired = #{condition.accountNonExpired}
+            </if>
+            <if test="condition.credentialsNonExpired != null">
+                AND u.credentials_non_expired = #{condition.credentialsNonExpired}
+            </if>
+            <if test="condition.accountNonLocked != null">
+                AND u.account_non_locked = #{condition.accountNonLocked}
+            </if>
+            <if test="condition.createTimeStart != null">
+                AND u.create_time >= #{condition.createTimeStart}
+            </if>
+            <if test="condition.createTimeEnd != null">
+                AND u.create_time &lt;= #{condition.createTimeEnd}
+            </if>
+            <if test="condition.lastLoginTimeStart != null">
+                AND u.last_login_time >= #{condition.lastLoginTimeStart}
+            </if>
+            <if test="condition.lastLoginTimeEnd != null">
+                AND u.last_login_time &lt;= #{condition.lastLoginTimeEnd}
+            </if>
+        </where>
+    </select>
+
+    <!-- 插入用户角色关系 -->
+    <insert id="insertUserRole">
+        INSERT INTO tb_user_role (user_id, role_id)
+        VALUES (#{userId}, #{roleId})
+    </insert>
+
+    <select id="countUsers" resultType="long">
+        SELECT COUNT(*) FROM tb_user WHERE enabled = true
+    </select>
+
+    <select id="countActiveUsers" resultType="long">
+        SELECT COUNT(*) FROM tb_user WHERE enabled = true
+    </select>
+
+    <select id="getRoleIdByCode" resultType="java.lang.Long">
+        SELECT id FROM tb_role WHERE role_code = #{roleCode}
+    </select>
+
+    <delete id="deleteUserRole">
+        DELETE FROM tb_user_role 
+        WHERE user_id = #{userId} AND role_id = #{roleId}
+    </delete>
+    <select id="checkUserRole" resultType="int">
+    SELECT COUNT(*) 
+    FROM tb_user_role 
+    WHERE user_id = #{userId} AND role_id = #{roleId}
+</select>
+</mapper>

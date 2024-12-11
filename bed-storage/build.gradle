@@ -1,0 +1,10 @@
+dependencies {
+    implementation project(':bed-base')
+    
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    
+    // 文件操作
+    implementation 'commons-io:commons-io:2.11.0'
+} 
