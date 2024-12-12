@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import web.sy.base.annotation.Anonymous;
 import web.sy.base.annotation.AnonymousRateLimit;
+import web.sy.base.config.GlobalConfig;
+import web.sy.base.exception.RegisterPolicyException;
 import web.sy.base.pojo.common.ResponseInfo;
 import web.sy.bed.service.AuthService;
 import web.sy.bed.service.WebUserService;
@@ -45,6 +47,10 @@ public class AuthController {
     @PostMapping("/register")
     @AnonymousRateLimit(count = 3, time = 1, timeUnit = TimeUnit.MINUTES, prefix = "register")
     public ResponseInfo<AuthResponse> register(@RequestBody @Valid TokenAuthReqVO registerReq) {
+        Boolean allowRegister = GlobalConfig.getConfig().getAllowRegister();
+        if (!allowRegister){
+            throw new RegisterPolicyException("当前系统不允许注册新用户");
+        }
         webUserService.register(registerReq.getUsername(), registerReq.getPassword(), registerReq.getEmail());
         return authService.login(registerReq);
     }

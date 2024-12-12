@@ -66,21 +66,13 @@ subprojects {
 
 tasks.register('npmDev', Exec) {
     workingDir 'ui'
-    if (System.getProperty('os.name').toLowerCase().contains('windows')) {
-        commandLine 'cmd', '/c', 'pnpm', 'dev'
-    } else {
-        commandLine '/usr/local/bin/pnpm', 'dev'
-    }
+    commandLine 'pnpm', 'dev'
     dependsOn npmInstall
 }
 
 tasks.register('npmBuild', Exec) {
     workingDir 'ui'
-    if (System.getProperty('os.name').toLowerCase().contains('windows')) {
-        commandLine 'cmd', '/c', 'pnpm', 'build'
-    } else {
-        commandLine '/usr/local/bin/pnpm', 'build'
-    }
+    commandLine 'pnpm', 'build'
     dependsOn npmInstall
 }
 
