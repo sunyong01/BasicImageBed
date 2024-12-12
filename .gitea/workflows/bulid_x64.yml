@@ -1,0 +1,126 @@
+name: Build x64
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      MAVEN_REPO_URL: https://maven.aliyun.com/repository/public
+
+    steps:
+      - uses: https://gitea.com/actions/checkout@v4
+      - name: Download JDK package
+        run: |
+          # 打印下载的目标路径
+          echo "Downloading JDK package to: ${{ runner.temp }}/java_package.tar.gz"
+          
+          wget --quiet -O ${{ runner.temp }}/java_package.tar.gz ${{ vars.OBJECT_MIRROR }}/opensource/OpenJDK21U-jdk_x64_linux_hotspot_21.0.5_11.tar.gz
+          echo "Downloaded file size: $SIZE"
+
+      - name: Set up JDK 21
+
+        uses: https://gitea.com/actions/setup-java@v4
+        with:
+          distribution: 'jdkfile'
+          architecture: x64
+          jdkFile: ${{ runner.temp }}/java_package.tar.gz
+          java-version: '21.0.5'
+
+
+
+      - name: Setup Node.js from custom source
+        run: |
+          wget --quiet ${{ vars.OBJECT_MIRROR }}/opensource/node-v20.18.1-linux-x64.tar.xz -O node.tar.xz
+          sudo tar -xf node.tar.xz -C /usr/local --strip-components=1
+          rm node.tar.xz
+
+      - name: Setup pnpm
+        uses: https://gitea.com/franklxw/action-setup@v2
+        with:
+          version: '9.15.0'
+
+      - name: Install pnpm dependencies
+        run: |
+          cd ui
+          pnpm config set registry ${{ vars.NPM_REG_LOCAL }}
+          pnpm install
+        # 更新 gradle-wrapper.properties 中的 distributionUrl
+
+      - name: Update Gradle Wrapper URL using gradle wrapper command
+        run: |
+          sed -i "s|distributionUrl=.*|distributionUrl=${{ vars.OBJECT_MIRROR }}/opensource/gradle-8.11.1-bin.zip|" gradle/wrapper/gradle-wrapper.properties
+          cat gradle/wrapper/gradle-wrapper.properties
+#          ./gradlew wrapper --gradle-version 8.11.1
+
+      - name: Build with Gradle
+        run: |
+          ./gradlew build --parallel --configure-on-demand
+        continue-on-error: true  # 允许构建失败继续执行后续步骤
+
+      - name: Verify Gradle Wrapper URL
+        run: |
+          cat gradle/wrapper/gradle-wrapper.properties
+
+      - name: Upload Problems Report
+        if: failure()  # 只在构建失败时执行
+        uses: https://gitea.com/actions/upload-artifact@v4
+        with:
+          name: problems-report
+          path: build/reports/problems/problems-report.html
+
+      - name: Display Problems Report
+        if: failure()
+        run: |
+          if [ -f build/reports/problems/problems-report.html ]; then
+            echo "Problems Report Content:"
+            echo "===================="
+            cat build/reports/problems/problems-report.html
+            echo "===================="
+          else
+            echo "Problems report file not found"
+          fi
+
+      # 为dev分支创建产物
+      - name: Create Release Package
+        if: github.ref == 'refs/heads/dev'
+        run: |
+          mkdir -p release
+          cp bed-web/build/libs/bed-web-*.jar release/app.jar
+          cp Dockerfile release/
+          cp docker-compose.yml release/
+          cd release
+          zip -r ../basic-image-bed.zip *
+
+      # 上传构建产物（dev分支）
+      - name: Upload Build Artifact
+        if: github.ref == 'refs/heads/dev'
+        uses: https://gitea.com/actions/upload-artifact@v3
+        with:
+          name: basic-image-bed
+          path: basic-image-bed.zip
+          retention-days: 5
+
+      # 为main分支创建Release
+      - name: Generate release tag
+        if: github.ref == 'refs/heads/main'
+        id: tag
+        run: |
+          echo "::set-output name=release_tag::release_$(date +"%Y.%m.%d_%H-%M")"
+
+      - name: Release
+        if: github.ref == 'refs/heads/main'
+        uses: https://gitea.com/actions/release-action@main
+        with:
+          files: bed-web/build/libs/bed-web-*.jar
+          tag_name: ${{ steps.tag.outputs.release_tag }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
