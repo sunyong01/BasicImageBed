@@ -5,9 +5,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-import web.sy.bed.base.annotation.ApiTokenSupport;
-import web.sy.bed.base.pojo.common.ResponseInfo;
-import web.sy.bed.base.pojo.entity.StrategyConfig;
+import web.sy.base.annotation.ApiTokenSupport;
+import web.sy.base.pojo.common.ResponseInfo;
+import web.sy.base.pojo.entity.StrategyConfig;
 import web.sy.bed.service.StorageStrategyService;
 
 import java.util.List;

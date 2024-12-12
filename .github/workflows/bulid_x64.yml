@@ -2,12 +2,12 @@ name: Build x64
 
 on:
   push:
-    branches: [ "main" ]
+    branches: 
+      - main
+      - dev
   pull_request:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    branches: 
+      - main
 
 jobs:
   build:
@@ -41,22 +41,37 @@ jobs:
       uses: gradle/gradle-build-action@v2
       with:
         arguments: build
+
+    # 为dev分支创建产物
+    - name: Create Release Package
+      if: github.ref == 'refs/heads/dev'
+      run: |
+        mkdir -p release
+        cp bed-web/build/libs/bed-web-*.jar release/app.jar
+        cp Dockerfile release/
+        cp docker-compose.yml release/
+        cd release
+        zip -r ../basic-image-bed.zip *
         
-    - name: Upload artifact
+    # 上传构建产物（dev分支）
+    - name: Upload Build Artifact
+      if: github.ref == 'refs/heads/dev'
       uses: actions/upload-artifact@v3
       with:
-        name: BasicImageBed
-        path: bed-web/build/libs/bed-web-*.jar
-        if-no-files-found: error
+        name: basic-image-bed
+        path: basic-image-bed.zip
+        retention-days: 5
 
+    # 为main分支创建Release
     - name: Generate release tag
+      if: github.ref == 'refs/heads/main'
       id: tag
       run: |
         echo "::set-output name=release_tag::release_$(date +"%Y.%m.%d_%H-%M")"
 
     - name: Release
-      uses: softprops/action-gh-release@v1
       if: github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v1
       with:
         files: bed-web/build/libs/bed-web-*.jar
         tag_name: ${{ steps.tag.outputs.release_tag }}

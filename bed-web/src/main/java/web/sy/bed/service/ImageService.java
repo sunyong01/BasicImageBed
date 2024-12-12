@@ -1,9 +1,9 @@
 package web.sy.bed.service;
 
 import org.springframework.web.multipart.MultipartFile;
-import web.sy.bed.base.pojo.common.ResponseInfo;
-import web.sy.bed.base.pojo.entity.ImageInfo;
-import web.sy.bed.base.pojo.common.PaginationVO;
+import web.sy.base.pojo.common.PaginationVO;
+import web.sy.base.pojo.common.ResponseInfo;
+import web.sy.base.pojo.entity.ImageInfo;
 
 import java.io.IOException;
 import java.io.OutputStream;

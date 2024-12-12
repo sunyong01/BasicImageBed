@@ -1,15 +1,14 @@
 version: '3.8'
 
 services:
-  myapp:
-    image: alpine/java:21
-    container_name: BasicImageBed
-    environment:
-      - ENV_FILE=/app/.env
-    env_file:
-      - .env
-    volumes:
-      - ./:/app/
-    command: java -jar /app/app.jar
+  app:
+    build: .
+    container_name: basic-image-bed
+    restart: unless-stopped
     ports:
       - "28123:8080"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - TZ=Asia/Shanghai
+      - JAVA_OPTS=-Xmx512m -Xms256m

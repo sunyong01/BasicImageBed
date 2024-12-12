@@ -2,7 +2,7 @@ package web.sy.bed.vo.resp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import web.sy.bed.base.pojo.entity.Role;
+import web.sy.base.pojo.entity.Role;
 
 import java.util.Date;
 import java.util.Set;

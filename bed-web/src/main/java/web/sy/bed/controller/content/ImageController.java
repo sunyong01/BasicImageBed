@@ -7,8 +7,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import web.sy.bed.base.annotation.Anonymous;
-import web.sy.bed.base.utils.ImageUtil;
+import web.sy.base.annotation.Anonymous;
+import web.sy.base.utils.ImageUtil;
 import web.sy.bed.service.ImageService;
 
 import java.io.IOException;

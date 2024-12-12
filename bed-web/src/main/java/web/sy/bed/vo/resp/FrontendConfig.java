@@ -1,8 +1,7 @@
 package web.sy.bed.vo.resp;
 
 import lombok.Data;
-import web.sy.bed.base.config.GlobalConfig;
-import web.sy.bed.base.pojo.dto.SystemConfigVO;
+import web.sy.base.config.GlobalConfig;
 
 @Data
 public class FrontendConfig {

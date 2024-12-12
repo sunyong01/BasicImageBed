@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="web.sy.bed.base.mapper.DataAnalysisMapper">
+<mapper namespace="web.sy.base.mapper.DataAnalysisMapper">
     <!-- 基础结果映射 -->
-    <resultMap id="BaseResultMap" type="web.sy.bed.base.pojo.entity.DataAnalysis">
+    <resultMap id="BaseResultMap" type="web.sy.base.pojo.entity.DataAnalysis">
         <id column="id" property="id"/>
         <result column="type" property="type"/>
         <result column="value" property="value"/>
@@ -11,7 +11,7 @@
     </resultMap>
 
     <!-- 插入数据分析记录 -->
-    <insert id="insert" parameterType="web.sy.bed.base.pojo.entity.DataAnalysis" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="web.sy.base.pojo.entity.DataAnalysis" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO tb_data_analysis (
             type,
             value,
@@ -26,7 +26,7 @@
     </insert>
 
     <!-- 更新数据分析记录 -->
-    <update id="update" parameterType="web.sy.bed.base.pojo.entity.DataAnalysis">
+    <update id="update" parameterType="web.sy.base.pojo.entity.DataAnalysis">
         UPDATE tb_data_analysis
         SET value = #{value},
             update_time = NOW()
@@ -52,7 +52,7 @@
     </select>
 
     <!-- 获取时间段内下载量前10的图片 -->
-    <select id="getTopDownloadedImages" resultType="web.sy.bed.base.pojo.entity.ImageInfo">
+    <select id="getTopDownloadedImages" resultType="web.sy.base.pojo.entity.ImageInfo">
         SELECT i.*, COUNT(l.id) as download_count
         FROM tb_image_info i
         JOIN tb_image_access_log l ON i.pathname = l.pathname
@@ -123,7 +123,7 @@
     </select>
 
     <!-- 获取用户最新上传的图片 -->
-    <select id="getLatestUploadedImages" resultType="web.sy.bed.base.pojo.entity.ImageInfo">
+    <select id="getLatestUploadedImages" resultType="web.sy.base.pojo.entity.ImageInfo">
         SELECT i.*
         FROM tb_image_info i
         JOIN tb_image_access_log l ON i.pathname = l.pathname

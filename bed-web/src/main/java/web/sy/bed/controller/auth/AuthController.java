@@ -7,13 +7,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-import web.sy.bed.base.annotation.Anonymous;
-import web.sy.bed.base.pojo.common.ResponseInfo;
+import web.sy.base.annotation.Anonymous;
+import web.sy.base.annotation.AnonymousRateLimit;
+import web.sy.base.pojo.common.ResponseInfo;
+import web.sy.bed.service.AuthService;
 import web.sy.bed.service.WebUserService;
 import web.sy.bed.vo.req.TokenAuthReqVO;
 import web.sy.bed.vo.resp.AuthResponse;
-import web.sy.bed.service.AuthService;
-import web.sy.bed.base.annotation.AnonymousRateLimit;
 
 import java.util.concurrent.TimeUnit;
 

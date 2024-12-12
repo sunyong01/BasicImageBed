@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="web.sy.bed.base.mapper.AlbumMapper">
+<mapper namespace="web.sy.base.mapper.AlbumMapper">
     <!-- 基础结果映射 -->
-    <resultMap id="BaseResultMap" type="web.sy.bed.base.pojo.entity.Album">
+    <resultMap id="BaseResultMap" type="web.sy.base.pojo.entity.Album">
         <id column="id" property="id" /><!-- 相册ID -->
         <result column="name" property="name" /><!-- 相册名称 -->
         <result column="description" property="description" /><!-- 相册描述 -->
@@ -15,7 +15,7 @@
     </resultMap>
 
     <!-- 插入新相册 -->
-    <insert id="insertAlbum" parameterType="web.sy.bed.base.pojo.entity.Album" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertAlbum" parameterType="web.sy.base.pojo.entity.Album" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO tb_album (
             name,           <!-- 相册名称 -->
             description,    <!-- 相册描述 -->
@@ -37,7 +37,7 @@
     </insert>
 
     <!-- 更新相册信息 -->
-    <update id="updateAlbum" parameterType="web.sy.bed.base.pojo.entity.Album">
+    <update id="updateAlbum" parameterType="web.sy.base.pojo.entity.Album">
         UPDATE tb_album
         SET name = #{name},                <!-- 更新相册名称 -->
             description = #{description},   <!-- 更新相册描述 -->

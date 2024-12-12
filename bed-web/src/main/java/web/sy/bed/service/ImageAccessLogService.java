@@ -1,6 +1,6 @@
 package web.sy.bed.service;
 
-import web.sy.bed.base.pojo.enums.OperationType;
+import web.sy.base.pojo.enums.OperationType;
 import web.sy.bed.vo.stats.AdminStatsVO;
 import web.sy.bed.vo.stats.StatsVO;
 

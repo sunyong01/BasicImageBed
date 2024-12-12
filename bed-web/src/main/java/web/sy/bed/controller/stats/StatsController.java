@@ -8,19 +8,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import web.sy.bed.base.annotation.RateLimit;
+import web.sy.base.annotation.RateLimit;
+import web.sy.base.annotation.RequireAuthentication;
+import web.sy.base.pojo.common.ResponseInfo;
+import web.sy.base.service.UserService;
+import web.sy.base.utils.ResponseBuilder;
 import web.sy.bed.controller.BaseController;
-import web.sy.bed.base.pojo.common.ResponseInfo;
+import web.sy.bed.service.ImageAccessLogService;
 import web.sy.bed.service.WebUserService;
 import web.sy.bed.vo.stats.AdminStatsVO;
 import web.sy.bed.vo.stats.StatsVO;
-import web.sy.bed.service.ImageAccessLogService;
-import web.sy.bed.base.service.UserService;
-import web.sy.bed.base.utils.ResponseBuilder;
-import web.sy.bed.base.annotation.RequireAuthentication;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
 @Tag(name = "统计数据接口", description = "获取系统统计数据")

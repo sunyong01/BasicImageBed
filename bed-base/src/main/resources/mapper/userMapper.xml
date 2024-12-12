@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="web.sy.bed.base.mapper.UserMapper">
+<mapper namespace="web.sy.base.mapper.UserMapper">
     
-    <resultMap id="userResultMap" type="web.sy.bed.base.pojo.entity.User">
+    <resultMap id="userResultMap" type="web.sy.base.pojo.entity.User">
         <id property="id" column="id"/>
         <result property="username" column="username"/>
         <result property="password" column="password"/>
@@ -13,14 +13,14 @@
         <result property="createTime" column="create_time"/>
         <result property="lastLoginTime" column="last_login_time"/>
         <!-- 关联角色集合 -->
-        <collection property="roles" ofType="web.sy.bed.base.pojo.entity.Role">
+        <collection property="roles" ofType="web.sy.base.pojo.entity.Role">
             <id property="id" column="role_id"/>
             <result property="roleName" column="role_name"/>
             <result property="roleCode" column="role_code"/>
             <result property="description" column="role_description"/>
         </collection>
         <!-- 关联权限集合 -->
-        <collection property="permissions" ofType="web.sy.bed.base.pojo.entity.Permission">
+        <collection property="permissions" ofType="web.sy.base.pojo.entity.Permission">
             <id property="id" column="permission_id"/>
             <result property="permissionName" column="permission_name"/>
             <result property="permissionCode" column="permission_code"/>
@@ -67,7 +67,7 @@
         WHERE up.email = #{email}
     </select>
 
-    <insert id="insert" parameterType="web.sy.bed.base.pojo.entity.User" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="web.sy.base.pojo.entity.User" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO tb_user (
             username, password, enabled, account_non_expired,
             credentials_non_expired, account_non_locked, create_time
@@ -77,7 +77,7 @@
         )
     </insert>
 
-    <update id="update" parameterType="web.sy.bed.base.pojo.entity.User">
+    <update id="update" parameterType="web.sy.base.pojo.entity.User">
         UPDATE tb_user
         <set>
             <if test="password != null">password = #{password},</if>

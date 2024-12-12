@@ -2,10 +2,10 @@ package web.sy.bed.controller;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import web.sy.bed.base.exception.AuthenticationException;
-import web.sy.bed.base.pojo.entity.User;
-import web.sy.bed.base.pojo.entity.UserProfile;
-import web.sy.bed.base.service.UserService;
+import web.sy.base.exception.AuthenticationException;
+import web.sy.base.pojo.entity.User;
+import web.sy.base.pojo.entity.UserProfile;
+import web.sy.base.service.UserService;
 import web.sy.bed.service.WebUserService;
 
 public abstract class BaseController {

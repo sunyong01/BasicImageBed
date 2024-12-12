@@ -2,15 +2,15 @@ package web.sy.bed.controller.system;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.bind.annotation.*;
-import web.sy.bed.base.annotation.RequireAuthentication;
-import web.sy.bed.base.pojo.common.ResponseInfo;
-import web.sy.bed.base.utils.ResponseBuilder;
-import web.sy.bed.base.service.SystemConfigService;
-import web.sy.bed.base.pojo.dto.SystemConfigVO;
-import web.sy.bed.base.event.ConfigChangeEvent;
+import web.sy.base.annotation.RequireAuthentication;
+import web.sy.base.event.ConfigChangeEvent;
+import web.sy.base.pojo.common.ResponseInfo;
+import web.sy.base.pojo.dto.SystemConfigVO;
+import web.sy.base.service.SystemConfigService;
+import web.sy.base.utils.ResponseBuilder;
 
 
 

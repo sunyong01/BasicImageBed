@@ -4,18 +4,12 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
-import web.sy.bed.base.config.GlobalConfig;
-import web.sy.bed.base.config.LoggingConfig;
-import web.sy.bed.base.pojo.entity.SystemConfig;
+import web.sy.base.config.GlobalConfig;
+import web.sy.base.config.LoggingConfig;
+import web.sy.base.pojo.entity.SystemConfig;
 
 
-@SpringBootApplication(exclude = {
-        SecurityAutoConfiguration.class,
-        UserDetailsServiceAutoConfiguration.class
-}, scanBasePackages = {"web.sy.bed", "web.sy.storage"}
-)
+@SpringBootApplication(scanBasePackages = {"web.sy.bed", "web.sy.storage", "web.sy.base"})
 public class BasicImageBedApplication {
     @Autowired
     private LoggingConfig loggingConfig;

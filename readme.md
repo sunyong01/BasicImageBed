@@ -52,12 +52,12 @@
      [ ] 图片审核功能
 
 ## Gradle操作
-  `gradle clean` 清理生成
-  `gradle bootRun` 直接运行
-  `gradle npmDev` 前端Dev模式
-  `gradle frontendBuild` 前端打包
+  `gradle clean` 清理生成     
+  `gradle bootRun` 直接运行    
+  `gradle npmDev` 前端Dev模式       
+  `gradle frontendBuild` 前端打包      
   `gradle build` 打包(自动将前端文件打包到jar中) 位置在 bed-web/build/libs/bed-web-0.0.1-SNAPSHOT.jar
-
+          
 
 ## 预览
 ![img.png](img/img.png)

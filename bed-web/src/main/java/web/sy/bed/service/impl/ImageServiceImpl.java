@@ -1,6 +1,7 @@
 package web.sy.bed.service.impl;
 
 import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.dromara.x.file.storage.core.Downloader;
@@ -10,28 +11,23 @@ import org.dromara.x.file.storage.core.hash.HashInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import web.sy.bed.base.config.GlobalConfig;
-import web.sy.bed.base.exception.StrategyNotAvailableException;
-import web.sy.bed.base.mapper.AlbumMapper;
-import web.sy.bed.base.mapper.ImageInfoMapper;
-import web.sy.bed.base.mapper.UserMapper;
-import web.sy.bed.base.mapper.UserProfileMapper;
-import web.sy.bed.base.pojo.common.ResponseInfo;
-import web.sy.bed.base.pojo.entity.ImageInfo;
-import web.sy.bed.base.pojo.entity.User;
-import web.sy.bed.base.pojo.entity.UserProfile;
-import web.sy.bed.base.pojo.enums.OperationType;
-import web.sy.bed.base.utils.ImageUtil;
-import web.sy.bed.base.utils.LinksUtil;
-import web.sy.bed.base.utils.ResponseBuilder;
-import web.sy.bed.base.utils.TimeUtils;
+import web.sy.base.config.GlobalConfig;
+import web.sy.base.exception.ImageException;
+import web.sy.base.exception.StrategyNotAvailableException;
+import web.sy.base.mapper.AlbumMapper;
+import web.sy.base.mapper.ImageInfoMapper;
+import web.sy.base.mapper.UserMapper;
+import web.sy.base.mapper.UserProfileMapper;
+import web.sy.base.pojo.common.PaginationVO;
+import web.sy.base.pojo.common.ResponseInfo;
+import web.sy.base.pojo.entity.ImageInfo;
+import web.sy.base.pojo.entity.User;
+import web.sy.base.pojo.entity.UserProfile;
+import web.sy.base.pojo.enums.OperationType;
+import web.sy.base.utils.*;
 import web.sy.bed.service.ImageAccessLogService;
 import web.sy.bed.service.ImageService;
 import web.sy.bed.service.StorageStrategySelector;
-import web.sy.bed.base.pojo.common.PaginationVO;
-import web.sy.bed.base.exception.ImageException;
-import lombok.RequiredArgsConstructor;
-import web.sy.bed.base.utils.PaginationUtil;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -43,7 +39,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import static web.sy.bed.base.utils.ImageUtil.getUniqueImageName;
+import static web.sy.base.utils.ImageUtil.getUniqueImageName;
 
 @Slf4j
 @Service
@@ -148,6 +144,7 @@ public class ImageServiceImpl implements ImageService {
                     .setPath(imageInfoByKey.getPathname().replace(imageInfoByKey.getName(), ""))
                     .setBasePath("bed/")
                     .setFilename(imageInfoByKey.getName());
+            log.debug("original: {}", original);
             RemoteFileInfo remoteFileInfo = storageStrategySelector.getFileStorageService().getFile(original);
             if (remoteFileInfo == null) {
                 throw new RuntimeException("文件不存在于对应的存储服务中!");

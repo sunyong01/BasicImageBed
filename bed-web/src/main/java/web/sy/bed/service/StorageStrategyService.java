@@ -1,7 +1,7 @@
 package web.sy.bed.service;
 
-import web.sy.bed.base.pojo.common.ResponseInfo;
-import web.sy.bed.base.pojo.entity.StrategyConfig;
+import web.sy.base.pojo.common.ResponseInfo;
+import web.sy.base.pojo.entity.StrategyConfig;
 
 import java.util.List;
 
