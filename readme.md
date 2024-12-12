@@ -21,13 +21,16 @@
 
 1. **HTTPS 配置**：如果博客使用了 HTTPS，则图床也需要使用 HTTPS，否则浏览器会在前端拦截。
 2. **域名配置**：请在配置文件中配置博客的服务器域名地址，否则无法使用。域名地址类似于这样：`https://static.blogdomain.com`
-3. **挂载磁盘**： 在容器启动时，挂载一个磁盘到 `/app` 目录，用于存储图片。如果不挂载磁盘，存储的图片会在容器关闭时丢失。
+3. **挂载磁盘**： 请修改docker-compose.yml中的挂载路径和端口号。默认使用的路径为当前文件夹和28123端口
 
 ## 启动方法
 
 ### 使用 Docker Compose（推荐）
 
-参照 docker-compose.yml，配置必要的环境变量后启动容器：
+你可以使用Release或Actions构建的版本。下载后,你讲得到一个zip文件，文件内包含了 `app.jar` `Dockerfile` 和 `docker-compose.yml` 三个文件。
+
+将这三个文件解压到你想放置图床服务的目录，进入此目录后，打开`docker-compose.yml`，修改配置文件，然后运行命令。
+如果你不想使用默认端口号和挂载路径，可以自行修改 `docker-compose.yml`后启动容器：
 
     docker-compose up -d
 
