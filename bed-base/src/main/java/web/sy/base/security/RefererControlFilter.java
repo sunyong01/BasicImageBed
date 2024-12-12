@@ -10,7 +10,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import web.sy.base.config.GlobalConfig;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.Arrays;
 
 @Slf4j
@@ -38,8 +38,8 @@ public class RefererControlFilter extends OncePerRequestFilter {
                 }
             } else {
                 try {
-                    URL refererUrl = new URL(referer);
-                    String refererHost = refererUrl.getHost();
+                    URI refererUri = new URI(referer);
+                    String refererHost = refererUri.getHost();
                     boolean isAllowedReferer = Arrays.stream(GlobalConfig.getConfig().getAllowedReferers())
                             .anyMatch(allowed -> matchesPattern(refererHost, allowed));
                     

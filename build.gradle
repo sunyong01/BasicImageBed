@@ -70,10 +70,15 @@ tasks.register('npmDev', Exec) {
     dependsOn npmInstall
 }
 
+tasks.register('npmUpgrade', Exec) {
+    workingDir 'ui'
+    commandLine 'pnpm', 'upgrade', '@vueuse/core@^10.7.0'
+}
+
 tasks.register('npmBuild', Exec) {
     workingDir 'ui'
     commandLine 'pnpm', 'build'
-    dependsOn npmInstall
+    dependsOn npmInstall, npmUpgrade
 }
 
 // 定义前端目录
@@ -97,7 +102,7 @@ def frontendBuild = tasks.register('frontendBuild') {
     dependsOn npmBuild, copyUi
 }
 
-// 确保所有子项目的构建依赖前端构建
+// 确保所有子项目的构建依赖前端��建
 subprojects {
     afterEvaluate {
         tasks.withType(ProcessResources).configureEach {
@@ -131,4 +136,9 @@ gradle.taskGraph.whenReady { graph ->
             shouldRunAfter frontendBuild
         }
     }
+}
+
+tasks.register('checkDeps', Exec) {
+    workingDir 'ui'
+    commandLine 'pnpm', 'dlx', 'depcheck'
 }

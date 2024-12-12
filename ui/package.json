@@ -15,6 +15,7 @@
     "element-plus": "^2.9.0",
     "pinia": "^2.2.8",
     "vue": "^3.5.13",
+    "@vueuse/core": "^10.7.0",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
