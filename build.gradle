@@ -14,18 +14,25 @@ plugins {
     id 'com.github.node-gradle.node' version '3.5.1'
 }
 
+
+// 立即定义 useCiRepos 属性并根据环境变量进行初始化
+ext.useCiRepos = System.getenv('USE_CI_REPOS')?.toBoolean() ?: false
+
 allprojects {
     group = 'web.sy'
     version = '0.0.1-SNAPSHOT'
-    
+
     repositories {
-        mavenLocal()
-        maven { url = uri('https://maven.aliyun.com/repository/public') }
-        maven { url = uri('https://repo.huaweicloud.com/repository/maven/') }
-        mavenCentral()
+        if (useCiRepos) {
+            mavenCentral()
+        } else {
+            mavenLocal()
+            maven { url = uri('https://maven.aliyun.com/repository/public') }
+            maven { url = uri('https://repo.huaweicloud.com/repository/maven/') }
+            mavenCentral()
+        }
     }
 }
-
 
 subprojects {
     apply plugin: 'java'
