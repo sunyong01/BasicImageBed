@@ -70,15 +70,10 @@ tasks.register('npmDev', Exec) {
     dependsOn npmInstall
 }
 
-tasks.register('npmUpgrade', Exec) {
-    workingDir 'ui'
-    commandLine 'pnpm', 'upgrade', '@vueuse/core@^10.7.0'
-}
-
 tasks.register('npmBuild', Exec) {
     workingDir 'ui'
     commandLine 'pnpm', 'build'
-    dependsOn npmInstall, npmUpgrade
+    dependsOn npmInstall
 }
 
 // 定义前端目录
