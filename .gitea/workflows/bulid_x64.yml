@@ -3,11 +3,11 @@ name: Build x64
 on:
   push:
     branches:
-      - main
+      - master
       - dev
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   build:
@@ -18,6 +18,25 @@ jobs:
 
     steps:
       - uses: https://gitea.com/actions/checkout@v4
+
+# Java cache setup
+      - name: Cache local Maven repository
+        uses: https://gitea.com/actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/build.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+# Node.js cache setup
+      - name: Cache Node.js modules
+        uses: https://gitea.com/actions/cache@v4
+        with:
+          path: ui/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('ui/package-lock.json', 'ui/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
       - name: Download JDK package
         run: |
           # 打印下载的目标路径
@@ -111,13 +130,13 @@ jobs:
 
       # 为main分支创建Release
       - name: Generate release tag
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/master'
         id: tag
         run: |
           echo "::set-output name=release_tag::release_$(date +"%Y.%m.%d_%H-%M")"
 
       - name: Release
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/master'
         uses: https://gitea.com/actions/release-action@main
         with:
           files: bed-web/build/libs/bed-web-*.jar
