@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - release
       - dev
   pull_request:
     branches:
@@ -98,15 +99,15 @@ jobs:
         path: basic-image-bed.zip
         retention-days: 5
 
-    # 为master分支创建Release
+    # 为release分支创建Release
     - name: Generate release tag
-      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/release'
       id: tag
       run: |
-        echo "::set-output name=release_tag::release_$(date +"%Y.%m.%d_%H-%M")"
+        echo "release_tag=release_$(date +'%Y.%m.%d_%H-%M')" >> $GITHUB_OUTPUT
 
     - name: Release
-      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/release'
       uses: softprops/action-gh-release@v1
       with:
         files: basic-image-bed.zip

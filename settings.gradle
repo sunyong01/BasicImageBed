@@ -3,11 +3,20 @@
  *
  * This project uses @Incubating APIs which are subject to change.
  */
+
 pluginManagement {
-    repositories {
-        maven { url 'https://maven.aliyun.com/repository/public' }
-        maven { url 'https://repo.huaweicloud.com/repository/maven/' }
-        gradlePluginPortal()
+    ext.useCiRepos = System.getenv('USE_CI_REPOS')?.toBoolean() ?: false
+    if (useCiRepos){
+        repositories {
+            gradlePluginPortal()
+            mavenCentral()
+        }
+    }else {
+        repositories {
+            maven { url 'https://maven.s.stdio.fun' }
+            maven { url 'https://maven.aliyun.com/repository/public' }
+            gradlePluginPortal()
+        }
     }
 }
 

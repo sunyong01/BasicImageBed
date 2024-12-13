@@ -24,9 +24,11 @@ allprojects {
 
     repositories {
         if (useCiRepos) {
+            mavenLocal()
             mavenCentral()
         } else {
             mavenLocal()
+            maven { url 'https://maven.s.stdio.fun' }
             maven { url = uri('https://maven.aliyun.com/repository/public') }
             maven { url = uri('https://repo.huaweicloud.com/repository/maven/') }
             mavenCentral()
