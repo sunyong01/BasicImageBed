@@ -122,7 +122,7 @@ jobs:
       # 上传构建产物（dev分支）
       - name: Upload Build Artifact
         if: github.ref == 'refs/heads/dev'
-        uses: https://gitea.com/actions/upload-artifact@v4
+        uses: https://gitea.com/actions/upload-artifact@v3
         with:
           name: basic-image-bed
           path: basic-image-bed.zip
