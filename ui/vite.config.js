@@ -9,6 +9,16 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src')
     }
   },
+  server: {
+    host: '0.0.0.0',
+    proxy: {
+      '/api': {
+        target: 'http://192.168.0.75:48123/',
+        // target: 'http://localhost:8080/',
+        changeOrigin: true
+      }
+    }
+  },
   build: {
     chunkSizeWarningLimit: 600,
     rollupOptions: {

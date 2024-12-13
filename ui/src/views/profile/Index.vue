@@ -24,10 +24,19 @@
         <el-form-item label="头像">
           <div class="avatar-wrapper">
             <div class="avatar-container">
-              <el-avatar 
-                :size="100" 
-                :src="form.avatar || '/imgs/default.jpg'"
-              />
+              <el-image 
+                :src="convertToProxyUrl(form.avatar) || '/imgs/default.jpg'"
+                class="avatar-preview"
+                fit="cover"
+              >
+                <template #error>
+                  <el-image
+                    src="/imgs/default.jpg"
+                    class="avatar-preview"
+                    fit="cover"
+                  />
+                </template>
+              </el-image>
             </div>
             <div class="avatar-input" v-if="isEditing">
               <el-input 
@@ -101,6 +110,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { profile } from '@/api'
 import { InfoFilled } from '@element-plus/icons-vue'
+import { convertToProxyUrl } from '@/utils/proxyUrl'
 
 export default {
   name: 'UserProfile',
@@ -220,7 +230,8 @@ export default {
       formatSize,
       calculateUsagePercentage,
       getStorageStatus,
-      getRoleTagType
+      getRoleTagType,
+      convertToProxyUrl
     }
   }
 }
@@ -251,6 +262,18 @@ export default {
 
 .avatar-container {
   flex-shrink: 0;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.avatar-preview {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .avatar-input {

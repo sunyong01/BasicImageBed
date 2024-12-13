@@ -11,6 +11,7 @@ public class FrontendConfig {
     private String maxUploadSize;
     private String allowedSuffixes;
     private String siteName;
+    private String serverUrl;
 
     public FrontendConfig fromSystemConfig(){
         this.systemInitialized = GlobalConfig.getInitialized();
@@ -19,6 +20,7 @@ public class FrontendConfig {
         this.maxUploadSize = String.valueOf(GlobalConfig.getConfig().getMaxSize());
         this.allowedSuffixes = GlobalConfig.getConfig().getAllowedTypes();
         this.siteName = GlobalConfig.getConfig().getSiteName();
+        this.serverUrl = GlobalConfig.getConfig().getServerUrl();
         return this;
     }
 }

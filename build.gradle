@@ -76,7 +76,7 @@ subprojects {
 tasks.register('npmDev', Exec) {
     workingDir 'ui'
 //    commandLine '/usr/local/bin/pnpm', 'dev'
-//    commandLine 'pnpm', 'dev'
+    commandLine 'pnpm', 'dev'
     dependsOn npmInstall
 }
 
@@ -108,7 +108,7 @@ def frontendBuild = tasks.register('frontendBuild') {
     dependsOn npmBuild, copyUi
 }
 
-// 确保所有子项目的构建依赖前端��建
+// 确保所有子项目的构建依赖前端构建
 subprojects {
     afterEvaluate {
         tasks.withType(ProcessResources).configureEach {
