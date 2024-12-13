@@ -4,15 +4,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
-import web.sy.bed.base.annotation.Anonymous;
-import web.sy.bed.base.config.GlobalConfig;
-import web.sy.bed.base.pojo.dto.InitRequest;
-import web.sy.bed.base.pojo.common.ResponseInfo;
-import web.sy.bed.base.pojo.entity.SystemConfig;
-import web.sy.bed.base.utils.SQLiteUtils;
+import web.sy.base.annotation.Anonymous;
+import web.sy.base.config.GlobalConfig;
+import web.sy.base.pojo.common.ResponseInfo;
+import web.sy.base.pojo.dto.InitRequest;
+import web.sy.base.service.InitService;
+import web.sy.base.utils.ResponseBuilder;
 import web.sy.bed.vo.resp.FrontendConfig;
-import web.sy.bed.base.service.InitService;
-import web.sy.bed.base.utils.ResponseBuilder;
 
 @Anonymous
 @RestController

@@ -4,12 +4,12 @@ import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import web.sy.bed.base.mapper.StrategyMapper;
-import web.sy.bed.base.pojo.common.ResponseInfo;
-import web.sy.bed.base.pojo.entity.StrategyConfig;
-import web.sy.bed.base.utils.ResponseBuilder;
-import web.sy.bed.service.StorageStrategyService;
+import web.sy.base.mapper.StrategyMapper;
+import web.sy.base.pojo.common.ResponseInfo;
+import web.sy.base.pojo.entity.StrategyConfig;
+import web.sy.base.utils.ResponseBuilder;
 import web.sy.bed.service.StorageStrategySelector;
+import web.sy.bed.service.StorageStrategyService;
 
 import java.util.List;
 

@@ -1,6 +1,7 @@
 package web.sy.bed.service;
 
-import web.sy.bed.base.pojo.entity.ImageInfo;
+import web.sy.base.pojo.entity.ImageInfo;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;

@@ -1,9 +1,9 @@
 package web.sy.bed.service;
 
-import web.sy.bed.base.pojo.common.ResponseInfo;
-import web.sy.bed.base.pojo.dto.AlbumDTO;
-import web.sy.bed.base.pojo.entity.Album;
-import web.sy.bed.base.pojo.common.PaginationVO;
+import web.sy.base.pojo.common.PaginationVO;
+import web.sy.base.pojo.common.ResponseInfo;
+import web.sy.base.pojo.dto.AlbumDTO;
+import web.sy.base.pojo.entity.Album;
 
 public interface AlbumService {
 

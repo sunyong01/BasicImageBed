@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
-import web.sy.bed.base.pojo.entity.Role;
+import web.sy.base.pojo.entity.Role;
 
 import java.time.LocalDateTime;
 import java.util.Set;

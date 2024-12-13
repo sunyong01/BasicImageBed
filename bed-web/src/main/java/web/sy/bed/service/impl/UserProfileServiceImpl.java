@@ -2,17 +2,17 @@ package web.sy.bed.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import web.sy.bed.base.mapper.UserMapper;
-import web.sy.bed.base.mapper.UserProfileMapper;
-import web.sy.bed.base.pojo.common.ResponseInfo;
-import web.sy.bed.base.pojo.dto.UserSearchDTO;
-import web.sy.bed.base.pojo.entity.User;
-import web.sy.bed.base.pojo.entity.UserProfile;
-import web.sy.bed.base.pojo.common.PaginationVO;
-import web.sy.bed.vo.ProfileVO;
+import web.sy.base.mapper.UserMapper;
+import web.sy.base.mapper.UserProfileMapper;
+import web.sy.base.pojo.common.PaginationVO;
+import web.sy.base.pojo.common.ResponseInfo;
+import web.sy.base.pojo.dto.UserSearchDTO;
+import web.sy.base.pojo.entity.User;
+import web.sy.base.pojo.entity.UserProfile;
+import web.sy.base.utils.PaginationUtil;
+import web.sy.base.utils.ResponseBuilder;
 import web.sy.bed.service.UserProfileService;
-import web.sy.bed.base.utils.ResponseBuilder;
-import web.sy.bed.base.utils.PaginationUtil;
+import web.sy.bed.vo.ProfileVO;
 
 import java.util.List;
 import java.util.Objects;

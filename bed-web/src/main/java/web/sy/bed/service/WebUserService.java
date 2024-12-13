@@ -1,11 +1,10 @@
 package web.sy.bed.service;
 
-import web.sy.bed.base.pojo.common.ResponseInfo;
-import web.sy.bed.base.pojo.entity.User;
-
-import web.sy.bed.base.pojo.entity.UserProfile;
-import web.sy.bed.base.pojo.dto.UserSearchDTO;
-import web.sy.bed.base.pojo.common.PaginationVO;
+import web.sy.base.pojo.common.PaginationVO;
+import web.sy.base.pojo.common.ResponseInfo;
+import web.sy.base.pojo.dto.UserSearchDTO;
+import web.sy.base.pojo.entity.User;
+import web.sy.base.pojo.entity.UserProfile;
 
 public interface WebUserService {
 

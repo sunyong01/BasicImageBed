@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="web.sy.bed.base.mapper.ImageAccessLogMapper">
-    <resultMap id="BaseResultMap" type="web.sy.bed.base.pojo.entity.ImageAccessLog">
+<mapper namespace="web.sy.base.mapper.ImageAccessLogMapper">
+    <resultMap id="BaseResultMap" type="web.sy.base.pojo.entity.ImageAccessLog">
         <id column="id" property="id"/>
         <result column="pathname" property="pathname"/>
         <result column="user_id" property="userId"/>
@@ -11,7 +11,7 @@
     </resultMap>
 
     <!-- 插入访问日志 -->
-    <insert id="insert" parameterType="web.sy.bed.base.pojo.entity.ImageAccessLog">
+    <insert id="insert" parameterType="web.sy.base.pojo.entity.ImageAccessLog">
         INSERT INTO tb_image_access_log (
             pathname,
             user_id,

@@ -3,9 +3,9 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="web.sy.bed.base.mapper.ImageInfoMapper">
+<mapper namespace="web.sy.base.mapper.ImageInfoMapper">
 
-    <resultMap id="BaseResultMap" type="web.sy.bed.base.pojo.entity.ImageInfo">
+    <resultMap id="BaseResultMap" type="web.sy.base.pojo.entity.ImageInfo">
         <id column="id" property="id"/>
         <result column="key" property="key"/>
         <result column="name" property="name"/>
@@ -53,7 +53,7 @@
         </if>
     </select>
     <!-- 插入图片信息 -->
-    <insert id="insertImageInfo" parameterType="web.sy.bed.base.pojo.entity.ImageInfo">
+    <insert id="insertImageInfo" parameterType="web.sy.base.pojo.entity.ImageInfo">
         INSERT INTO tb_image_info (`key`, name, origin_name, pathname, size, width, height, md5, sha1, date, strategy, is_public, upload_user, album_id)
         VALUES (#{key}, #{name}, #{originName}, #{pathname}, #{size}, #{width}, #{height}, #{md5}, #{sha1}, #{date}, #{strategy}, #{isPublic}, #{uploadUser}, #{albumId})
     </insert>
@@ -69,7 +69,7 @@
     </select>
 
     <!-- 更新图片信息 -->
-    <update id="updateImage" parameterType="web.sy.bed.base.pojo.entity.ImageInfo">
+    <update id="updateImage" parameterType="web.sy.base.pojo.entity.ImageInfo">
         UPDATE tb_image_info
         SET album_id = #{albumId}
         <if test="isPublic != null">

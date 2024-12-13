@@ -5,9 +5,9 @@ import lombok.Getter;
 import org.dromara.x.file.storage.core.FileInfo;
 import org.dromara.x.file.storage.core.FileStorageProperties;
 import org.dromara.x.file.storage.core.FileStorageService;
+import org.dromara.x.file.storage.core.FileStorageServiceBuilder;
 import org.dromara.x.file.storage.core.platform.FileStorage;
 import org.springframework.stereotype.Component;
-import org.dromara.x.file.storage.core.FileStorageServiceBuilder;
 import web.sy.storage.strategy.config.StrategyConfigBuilderEnum;
 import web.sy.storage.strategy.config.StrategyInitPropertiesHelper;
 

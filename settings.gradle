@@ -3,6 +3,13 @@
  *
  * This project uses @Incubating APIs which are subject to change.
  */
+pluginManagement {
+    repositories {
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://repo.huaweicloud.com/repository/maven/' }
+        gradlePluginPortal()
+    }
+}
 
 rootProject.name = 'BasicImageBed'
 include 'bed-base'

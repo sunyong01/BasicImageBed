@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="web.sy.bed.base.mapper.StrategyMapper">
+<mapper namespace="web.sy.base.mapper.StrategyMapper">
     <!-- 基础结果映射 -->
-    <resultMap id="BaseResultMap" type="web.sy.bed.base.pojo.entity.StrategyConfig">
+    <resultMap id="BaseResultMap" type="web.sy.base.pojo.entity.StrategyConfig">
         <id column="id" property="id"/>
         <result column="strategy_type" property="strategyType"
-                javaType="web.sy.bed.base.pojo.enums.Strategy"/>
+                javaType="web.sy.base.pojo.enums.Strategy"/>
         <result column="config_json" property="configJson" 
-                typeHandler="web.sy.bed.base.handler.JsonTypeHandler"/>
+                typeHandler="web.sy.base.handler.JsonTypeHandler"/>
         <result column="max_capacity" property="maxCapacity"/>
         <result column="used_capacity" property="usedCapacity"/>
         <result column="strategy_name" property="strategyName"/>
@@ -16,7 +16,7 @@
     </resultMap>
 
     <!-- 插入存储策略配置 -->
-    <insert id="insert" parameterType="web.sy.bed.base.pojo.entity.StrategyConfig" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="web.sy.base.pojo.entity.StrategyConfig" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO tb_strategy (
             strategy_type,
             config_json,
@@ -27,7 +27,7 @@
             sort_order
         ) VALUES (
             #{strategyType},
-            #{configJson,typeHandler=web.sy.bed.base.handler.JsonTypeHandler},
+            #{configJson,typeHandler=web.sy.base.handler.JsonTypeHandler},
             #{maxCapacity},
             #{usedCapacity},
             #{strategyName},
@@ -37,10 +37,10 @@
     </insert>
 
     <!-- 更新存储策略配置 -->
-    <update id="update" parameterType="web.sy.bed.base.pojo.entity.StrategyConfig">
+    <update id="update" parameterType="web.sy.base.pojo.entity.StrategyConfig">
         UPDATE tb_strategy
         <set>
-            <if test="configJson != null">config_json = #{configJson,typeHandler=web.sy.bed.base.handler.JsonTypeHandler},</if>
+            <if test="configJson != null">config_json = #{configJson,typeHandler=web.sy.base.handler.JsonTypeHandler},</if>
             <if test="maxCapacity != null">max_capacity = #{maxCapacity},</if>
             <if test="usedCapacity != null">used_capacity = #{usedCapacity},</if>
             <if test="strategyName != null">strategy_name = #{strategyName},</if>

@@ -7,10 +7,10 @@ import org.dromara.x.file.storage.core.FileStorageService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import web.sy.bed.base.config.event.MybatisAvailableEvent;
-import web.sy.bed.base.exception.NoAvailableStrategyException;
-import web.sy.bed.base.mapper.StrategyMapper;
-import web.sy.bed.base.pojo.entity.StrategyConfig;
+import web.sy.base.config.event.MybatisAvailableEvent;
+import web.sy.base.exception.NoAvailableStrategyException;
+import web.sy.base.mapper.StrategyMapper;
+import web.sy.base.pojo.entity.StrategyConfig;
 import web.sy.storage.strategy.StorageStrategyManager;
 
 import java.util.HashMap;
@@ -63,7 +63,7 @@ public class StorageStrategySelector implements ApplicationListener<MybatisAvail
         }
 
         // 使用第一个StrategyConfig来初始化StorageStrategyManager
-        StrategyConfig initialConfig = strategyConfigs.get(0);
+        StrategyConfig initialConfig = strategyConfigs.getFirst();
         storageStrategyManager.init(initialConfig.getStrategyType().getValue(), initialConfig.getConfigJson());
 
         // 将其他的StrategyConfig添加到StorageStrategyManager

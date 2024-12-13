@@ -326,7 +326,7 @@ export default {
     // 添加重启系统方法
     const handleRestart = () => {
       ElMessageBox.confirm(
-        '确定要重启系统吗？重启期间���统将暂时无法访问。',
+        '确定要重启系统吗？重启期间将暂时无法访问。',
         '警告',
         {
           confirmButtonText: '确定',

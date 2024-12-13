@@ -7,21 +7,19 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import org.springframework.web.bind.annotation.*;
-import web.sy.bed.base.service.UserService;
+import web.sy.base.annotation.RequireAuthentication;
+import web.sy.base.pojo.common.PaginationVO;
+import web.sy.base.pojo.common.ResponseInfo;
+import web.sy.base.pojo.dto.UserSearchDTO;
+import web.sy.base.pojo.entity.User;
+import web.sy.base.service.UserService;
+import web.sy.base.utils.ResponseBuilder;
 import web.sy.bed.controller.BaseController;
-import web.sy.bed.base.pojo.common.ResponseInfo;
-import web.sy.bed.base.pojo.dto.UserSearchDTO;
-import web.sy.bed.base.pojo.entity.User;
-import web.sy.bed.base.pojo.common.PaginationVO;
+import web.sy.bed.service.ImageService;
+import web.sy.bed.service.UserProfileService;
+import web.sy.bed.service.WebUserService;
 import web.sy.bed.vo.ProfileVO;
 import web.sy.bed.vo.req.TokenAuthReqVO;
-import web.sy.bed.service.UserProfileService;
-
-import web.sy.bed.base.utils.ResponseBuilder;
-import web.sy.bed.base.annotation.RequireAuthentication;
-import web.sy.bed.service.WebUserService;
-import web.sy.bed.service.ImageService;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @Tag(name = "用户管理接口", description = "用户管理接口")

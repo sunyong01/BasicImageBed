@@ -7,18 +7,18 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import web.sy.bed.base.annotation.ApiTokenSupport;
-import web.sy.bed.base.annotation.RateLimit;
-import web.sy.bed.base.config.GlobalConfig;
+import web.sy.base.annotation.ApiTokenSupport;
+import web.sy.base.annotation.RateLimit;
+import web.sy.base.annotation.RequireAuthentication;
+import web.sy.base.config.GlobalConfig;
+import web.sy.base.pojo.common.PaginationVO;
+import web.sy.base.pojo.common.ResponseInfo;
+import web.sy.base.pojo.entity.ImageInfo;
+import web.sy.base.service.UserService;
+import web.sy.base.utils.ResponseBuilder;
 import web.sy.bed.controller.BaseController;
-import web.sy.bed.base.pojo.common.ResponseInfo;
-import web.sy.bed.base.pojo.entity.ImageInfo;
-import web.sy.bed.service.WebUserService;
-import web.sy.bed.base.pojo.common.PaginationVO;
 import web.sy.bed.service.ImageService;
-import web.sy.bed.base.service.UserService;
-import web.sy.bed.base.utils.ResponseBuilder;
-import web.sy.bed.base.annotation.RequireAuthentication;
+import web.sy.bed.service.WebUserService;
 
 import java.util.concurrent.TimeUnit;
 

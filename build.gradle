@@ -14,18 +14,25 @@ plugins {
     id 'com.github.node-gradle.node' version '3.5.1'
 }
 
+
+// 立即定义 useCiRepos 属性并根据环境变量进行初始化
+ext.useCiRepos = System.getenv('USE_CI_REPOS')?.toBoolean() ?: false
+
 allprojects {
     group = 'web.sy'
     version = '0.0.1-SNAPSHOT'
-    
+
     repositories {
-        mavenLocal()
-        maven { url = uri('https://maven.aliyun.com/repository/public') }
-        maven { url = uri('https://repo.huaweicloud.com/repository/maven/') }
-        mavenCentral()
+        if (useCiRepos) {
+            mavenCentral()
+        } else {
+            mavenLocal()
+            maven { url = uri('https://maven.aliyun.com/repository/public') }
+            maven { url = uri('https://repo.huaweicloud.com/repository/maven/') }
+            mavenCentral()
+        }
     }
 }
-
 
 subprojects {
     apply plugin: 'java'
@@ -66,21 +73,15 @@ subprojects {
 
 tasks.register('npmDev', Exec) {
     workingDir 'ui'
-    if (System.getProperty('os.name').toLowerCase().contains('windows')) {
-        commandLine 'cmd', '/c', 'pnpm', 'dev'
-    } else {
-        commandLine '/usr/local/bin/pnpm', 'dev'
-    }
+//    commandLine '/usr/local/bin/pnpm', 'dev'
+//    commandLine 'pnpm', 'dev'
     dependsOn npmInstall
 }
 
 tasks.register('npmBuild', Exec) {
     workingDir 'ui'
-    if (System.getProperty('os.name').toLowerCase().contains('windows')) {
-        commandLine 'cmd', '/c', 'pnpm', 'build'
-    } else {
-        commandLine '/usr/local/bin/pnpm', 'build'
-    }
+//    commandLine '/usr/local/bin/pnpm', 'build'
+    commandLine 'pnpm', 'build'
     dependsOn npmInstall
 }
 
@@ -105,7 +106,7 @@ def frontendBuild = tasks.register('frontendBuild') {
     dependsOn npmBuild, copyUi
 }
 
-// 确保所有子项目的构建依赖前端构建
+// 确保所有子项目的构建依赖前端��建
 subprojects {
     afterEvaluate {
         tasks.withType(ProcessResources).configureEach {
@@ -139,4 +140,9 @@ gradle.taskGraph.whenReady { graph ->
             shouldRunAfter frontendBuild
         }
     }
+}
+
+tasks.register('checkDeps', Exec) {
+    workingDir 'ui'
+    commandLine 'pnpm', 'dlx', 'depcheck'
 }

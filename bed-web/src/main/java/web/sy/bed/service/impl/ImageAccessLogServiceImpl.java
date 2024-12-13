@@ -4,19 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import web.sy.bed.base.pojo.enums.OperationType;
-import web.sy.bed.base.mapper.ImageAccessLogMapper;
-import web.sy.bed.base.mapper.ImageInfoMapper;
-import web.sy.bed.base.mapper.UserMapper;
-import web.sy.bed.base.mapper.UserProfileMapper;
-import web.sy.bed.base.mapper.AlbumMapper;
-import web.sy.bed.base.pojo.entity.ImageAccessLog;
-import web.sy.bed.base.pojo.entity.UserProfile;
+import web.sy.base.mapper.*;
+import web.sy.base.pojo.entity.ImageAccessLog;
+import web.sy.base.pojo.entity.UserProfile;
+import web.sy.base.pojo.enums.OperationType;
+import web.sy.bed.service.ImageAccessLogService;
 import web.sy.bed.vo.stats.AdminStatsVO;
 import web.sy.bed.vo.stats.StatsVO;
-import web.sy.bed.service.ImageAccessLogService;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -152,15 +147,6 @@ public class ImageAccessLogServiceImpl implements ImageAccessLogService {
         statsVO.setRecentDownloadedImages(recentDownloaded);
         
         return statsVO;
-    }
-
-    // 添加检查是否是管理员的方法
-    private boolean hasAdminRole() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null && 
-               authentication.getAuthorities().stream()
-                   .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN") || 
-                                    auth.getAuthority().equals("ROLE_SUPER_ADMIN"));
     }
 
     @Override

@@ -18,9 +18,6 @@
         </el-form-item>
 
         <h3>存储配置</h3>
-        <el-form-item label="本地存储路径">
-          <el-input v-model="form.localPath" placeholder="图片存储的本地路径" />
-        </el-form-item>
         <el-form-item label="服务访问地址">
           <el-input v-model="form.serverUrl" placeholder="例如：https://img.example.com/" />
         </el-form-item>
@@ -66,7 +63,7 @@
           <el-input 
             v-model="form.adminPassword" 
             type="password"
-            placeholder="默认为：admin"
+            placeholder="默认为admin"
             show-password
           />
         </el-form-item>
@@ -96,7 +93,6 @@ const form = reactive({
   dbUrl: '',
   dbUsername: '',
   dbPassword: '',
-  localPath: '',
   serverUrl: '',
   allowSizeKb: 5120,
   allowSuffix: 'jpg,jpeg,png,gif,bmp,webp',
