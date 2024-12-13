@@ -137,7 +137,7 @@ jobs:
 
       - name: Release
         if: github.ref == 'refs/heads/master'
-        uses: https://gitea.com/actions/release-action@master
+        uses: https://gitea.com/actions/release-action@main
         with:
           files: bed-web/build/libs/bed-web-*.jar
           tag_name: ${{ steps.tag.outputs.release_tag }}
