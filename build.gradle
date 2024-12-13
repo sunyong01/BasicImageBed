@@ -73,12 +73,14 @@ subprojects {
 
 tasks.register('npmDev', Exec) {
     workingDir 'ui'
-    commandLine 'pnpm', 'dev'
+//    commandLine '/usr/local/bin/pnpm', 'dev'
+//    commandLine 'pnpm', 'dev'
     dependsOn npmInstall
 }
 
 tasks.register('npmBuild', Exec) {
     workingDir 'ui'
+//    commandLine '/usr/local/bin/pnpm', 'build'
     commandLine 'pnpm', 'build'
     dependsOn npmInstall
 }

@@ -4,19 +4,44 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import web.sy.base.pojo.entity.SystemConfig;
 
+import java.io.File;
 import java.sql.*;
 
 @Slf4j
 public class SQLiteUtils {
-    private static final String DB_URL = "jdbc:sqlite:config.db";
+    private static final String DB_PATH = "data/config.db";
+    private static final String DB_URL = "jdbc:sqlite:" + DB_PATH;
     private static final String CONFIG_KEY = "system.config";
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    static {
+        initDatabase();
+    }
+
+    private static void initDatabase() {
+        File dbFile = new File(DB_PATH);
+        if (!dbFile.exists()) {
+            // 确保目录存在
+            File dbDir = dbFile.getParentFile();
+            if (!dbDir.exists() && !dbDir.mkdirs()) {
+                throw new RuntimeException("Failed to create database directory");
+            }
+            
+            // 创建数据库文件和表
+            try (Connection ignored = getConnection()) {
+                log.info("Database file created at: {}", dbFile.getAbsolutePath());
+                initSqliteTable();
+            } catch (SQLException e) {
+                throw new RuntimeException("Failed to initialize database", e);
+            }
+        }
+    }
 
     private static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL);
     }
 
-    public static void initSqliteTable(){
+    public static void initSqliteTable() {
         String createSystemConfigTable = """
                 CREATE TABLE IF NOT EXISTS system_config (
                     key TEXT PRIMARY KEY,
@@ -27,7 +52,9 @@ public class SQLiteUtils {
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
             stmt.execute(createSystemConfigTable);
+            log.info("System config table initialized");
         } catch (SQLException e) {
+            log.error("Failed to create table", e);
             throw new RuntimeException("Failed to create table", e);
         }
     }
