@@ -63,9 +63,10 @@ jobs:
           rm node.tar.xz
 
       - name: Setup pnpm
-        uses: https://gitea.com/franklxw/action-setup@v2
-        with:
-          version: '9.15.0'
+        run: |
+          npm config set registry ${{ vars.NPM_REG_LOCAL }}
+          npm install -g pnpm
+
 
       - name: Install pnpm dependencies
         run: |
@@ -108,9 +109,7 @@ jobs:
             echo "Problems report file not found"
           fi
 
-      # 为dev分支创建产物
       - name: Create Release Package
-        if: github.ref == 'refs/heads/dev'
         run: |
           mkdir -p release
           cp bed-web/build/libs/bed-web-*.jar release/app.jar
@@ -137,9 +136,7 @@ jobs:
 
       - name: Release
         if: github.ref == 'refs/heads/master'
-        uses: https://gitea.com/actions/release-action@main
+        uses: https://gitea.com/akkuman/gitea-release-action@v1
         with:
-          files: bed-web/build/libs/bed-web-*.jar
+          files: basic-image-bed.zip
           tag_name: ${{ steps.tag.outputs.release_tag }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}

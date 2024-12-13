@@ -3,11 +3,11 @@ name: Build x64
 on:
   push:
     branches:
-      - main
+      - master
       - dev
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   build:
@@ -80,9 +80,7 @@ jobs:
           echo "Problems report file not found"
         fi
 
-    # 为dev分支创建产物
     - name: Create Release Package
-      if: github.ref == 'refs/heads/dev'
       run: |
         mkdir -p release
         cp bed-web/build/libs/bed-web-*.jar release/app.jar
@@ -100,18 +98,18 @@ jobs:
         path: basic-image-bed.zip
         retention-days: 5
 
-    # 为main分支创建Release
+    # 为master分支创建Release
     - name: Generate release tag
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/master'
       id: tag
       run: |
         echo "::set-output name=release_tag::release_$(date +"%Y.%m.%d_%H-%M")"
 
     - name: Release
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/master'
       uses: softprops/action-gh-release@v1
       with:
-        files: bed-web/build/libs/bed-web-*.jar
+        files: basic-image-bed.zip
         tag_name: ${{ steps.tag.outputs.release_tag }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
