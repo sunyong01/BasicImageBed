@@ -12,27 +12,75 @@
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
           <el-breadcrumb-item>{{ currentRoute }}</el-breadcrumb-item>
         </el-breadcrumb>
-        <div class="user-info">
-          <el-dropdown @command="handleCommand">
-            <div class="user-dropdown">
-              <el-avatar 
-                :size="40" 
-                :src="userInfo.avatar || '/imgs/default.jpg'"
-                class="user-avatar"
-              />
-              <el-icon><arrow-down /></el-icon>
-            </div>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <div class="user-info-header">
-                  <span class="username">{{ userInfo.nickname || userInfo.username }}</span>
+        <div class="header-right">
+          <div class="proxy-switch">
+            <div class="proxy-info">
+              <el-tooltip
+                v-if="showProxyWarning"
+                content="当前访问图床的地址与配置的服务器地址不一致，如果管理系统中无法正确显示图片，请打开图片域名代理"
+                placement="bottom"
+              >
+                <el-icon class="warning-icon"><Warning /></el-icon>
+              </el-tooltip>
+              <div class="url-info">
+                <div class="url-row">
+                  <span class="url-label">当前地址：</span>
+                  <span class="url-value">{{ formattedServerUrl }}</span>
                 </div>
-                <el-dropdown-item divided command="profile">个人信息</el-dropdown-item>
-                <el-dropdown-item command="password">修改密码</el-dropdown-item>
-                <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+                <div class="url-row">
+                  <span class="url-label">访问地址：</span>
+                  <span class="url-value">{{ formattedCurrentUrl }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="switch-wrapper">
+              <span class="switch-label">图片域名代理</span>
+              <el-switch
+                v-model="proxyEnabled"
+                @change="handleProxyChange"
+              >
+                <template #default>
+                  <el-tooltip
+                    content="开启后，图片链接将使用系统配置的访问地址"
+                    placement="bottom"
+                  >
+                    <el-icon><InfoFilled /></el-icon>
+                  </el-tooltip>
+                </template>
+              </el-switch>
+            </div>
+          </div>
+          <div class="user-info">
+            <el-dropdown @command="handleCommand">
+              <div class="user-dropdown">
+                <el-image 
+                  :size="40" 
+                  :src="convertToProxyUrl(userInfo.avatar) || '/imgs/default.jpg'"
+                  class="user-avatar"
+                  fit="cover"
+                >
+                  <template #error>
+                    <el-image
+                      src="/imgs/default.jpg"
+                      class="user-avatar"
+                      fit="cover"
+                    />
+                  </template>
+                </el-image>
+                <el-icon><arrow-down /></el-icon>
+              </div>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <div class="user-info-header">
+                    <span class="username">{{ userInfo.nickname || userInfo.username }}</span>
+                  </div>
+                  <el-dropdown-item divided command="profile">个人信息</el-dropdown-item>
+                  <el-dropdown-item command="password">修改密码</el-dropdown-item>
+                  <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </div>
       </div>
       <div class="main-content">
@@ -93,16 +141,19 @@
 <script>
 import { ref, computed, onMounted, reactive, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ArrowDown } from '@element-plus/icons-vue'
+import { ArrowDown, InfoFilled, Warning } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import Navigation from '../components/Navigation.vue'
 import { user, auth } from '@/api'
+import { convertToProxyUrl } from '@/utils/proxyUrl'
 
 export default {
   name: 'MainLayout',
   components: {
     Navigation,
-    ArrowDown
+    ArrowDown,
+    InfoFilled,
+    Warning
   },
   setup() {
     const route = useRoute()
@@ -134,7 +185,7 @@ export default {
       return routeMap[route.path] || ''
     })
 
-    // 添加修改密码相关的响应式变量
+    // 添加修改密码相关响应式变量
     const passwordDialogVisible = ref(false)
     const passwordFormRef = ref(null)
     const passwordLoading = ref(false)
@@ -179,7 +230,7 @@ export default {
       ]
     }
 
-    // 修改密码提交方法
+    // 修改密提交方法
     const submitPasswordForm = async () => {
       if (!passwordFormRef.value) return
       
@@ -240,6 +291,47 @@ export default {
       }
     }, { immediate: true })
 
+    // 代理开关状态
+    const proxyEnabled = ref(localStorage.getItem('imageProxyEnabled') === 'true')
+
+    // 处理代理开关变化
+    const handleProxyChange = (value) => {
+      localStorage.setItem('imageProxyEnabled', value)
+    }
+
+    const currentUrl = ref(window.location.origin)
+
+    // 格式化 URL 显示，确保带上斜杠
+    const formatUrl = (url) => url?.endsWith('/') ? url : `${url}/`
+
+    // 计算属性：格式化后的当前地址
+    const formattedServerUrl = computed(() => 
+      formatUrl(frontConfig.value?.data?.serverUrl) || '未设置'
+    )
+
+    // 计算属性：格式化后的访问地址
+    const formattedCurrentUrl = computed(() => 
+      formatUrl(currentUrl.value)
+    )
+
+    // 添加警告显示逻辑
+    const showProxyWarning = computed(() => {
+      if (proxyEnabled.value) return false
+      
+      const serverUrl = frontConfig.value?.data?.serverUrl
+      if (!serverUrl || !currentUrl.value) return false
+
+      try {
+        // 标准化 URL，确保都以斜杠结尾
+        const normalizeUrl = (url) => url.endsWith('/') ? url : `${url}/`
+        const normalizedServer = normalizeUrl(serverUrl)
+        const normalizedCurrent = normalizeUrl(currentUrl.value)
+        return normalizedServer !== normalizedCurrent
+      } catch (error) {
+        return false
+      }
+    })
+
     onMounted(() => {
       fetchUserInfo()
     })
@@ -254,7 +346,14 @@ export default {
       passwordRules,
       passwordLoading,
       submitPasswordForm,
-      frontConfig
+      frontConfig,
+      proxyEnabled,
+      handleProxyChange,
+      currentUrl,
+      formattedServerUrl,
+      formattedCurrentUrl,
+      convertToProxyUrl,
+      showProxyWarning
     }
   }
 }
@@ -309,6 +408,85 @@ export default {
   justify-content: space-between;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.proxy-switch {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.proxy-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.url-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.url-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.url-label {
+  color: #909399;
+  min-width: 70px;
+}
+
+.url-value {
+  color: #409EFF;
+  font-family: monospace;
+}
+
+.warning-icon,
+.proxy-info:has(.warning-icon) .url-value {
+  animation: pulse 2s infinite;
+}
+
+.warning-icon {
+  color: #F56C6C;
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-right: 4px;
+  transform: translateY(2px);
+}
+
+.proxy-info:has(.warning-icon) .url-value {
+  color: #E6A23C;  /* 使用 Element Plus 的警告色 */
+}
+
+.switch-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.switch-label {
+  font-size: 14px;
+  color: #606266;
+}
+
+:deep(.el-switch) {
+  margin-right: 4px;
+}
+
+:deep(.el-tooltip__trigger) {
+  color: #909399;
+}
+
 .user-info {
   display: flex;
   align-items: center;
@@ -324,13 +502,11 @@ export default {
 }
 
 .user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   border: 2px solid #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
-}
-
-.user-dropdown:hover .user-avatar {
-  transform: scale(1.05);
 }
 
 .user-info-header {
@@ -364,5 +540,17 @@ export default {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 </style> 

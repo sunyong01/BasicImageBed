@@ -33,7 +33,7 @@
         <el-card class="album-card" :body-style="{ padding: '0px' }" @click="navigateToImages(album)">
           <div class="album-cover">
             <el-image 
-              :src="album.cover_url || defaultCover" 
+              :src="album.cover_url ? convertToProxyUrl(album.cover_url) : defaultCover" 
               class="image"
               fit="cover"
               loading="lazy"
@@ -196,6 +196,7 @@ import {
 } from '@element-plus/icons-vue'
 import { album, hasAnyRole } from '@/api'
 import { useRouter } from 'vue-router'
+import { convertToProxyUrl } from '@/utils/proxyUrl'
 
 export default {
   name: 'AlbumIndex',
@@ -416,7 +417,8 @@ export default {
       applyFilter,
       navigateToImages,
       formatDate,
-      hasAnyRole
+      hasAnyRole,
+      convertToProxyUrl
     }
   }
 }

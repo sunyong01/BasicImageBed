@@ -39,8 +39,8 @@
         <el-card class="image-card" :body-style="{ padding: '0px' }">
           <div class="image-cover">
             <el-image 
-              :src="image.links.thumbnailUrl" 
-              :preview-src-list="[image.links.url]"
+              :src="convertToProxyUrl(image.links.thumbnailUrl)" 
+              :preview-src-list="convertUrlsToProxy([image.links.url])"
               :preview-teleported="true"
               fit="contain"
               loading="lazy"
@@ -88,24 +88,42 @@
                   </el-button>
                   <template #dropdown>
                     <el-dropdown-menu>
-                      <el-dropdown-item :command="{type: 'url', url: image.links.url}">
-                        原图链接
-                      </el-dropdown-item>
-                      <el-dropdown-item :command="{type: 'thumbnailUrl', url: image.links.thumbnailUrl}">
-                        缩略图链接
-                      </el-dropdown-item>
-                      <el-dropdown-item :command="{type: 'html', url: image.links.html}">
-                        HTML代码
-                      </el-dropdown-item>
-                      <el-dropdown-item :command="{type: 'markdown', url: image.links.markdown}">
-                        Markdown
-                      </el-dropdown-item>
-                      <el-dropdown-item :command="{type: 'bbcode', url: image.links.bbcode}">
-                        BBCode
-                      </el-dropdown-item>
-                      <el-dropdown-item :command="{type: 'markdownWithLink', url: image.links.markdownWithLink}">
-                        Markdown带链接
-                      </el-dropdown-item>
+                      <div class="dropdown-item-with-input">
+                        <el-dropdown-item :command="{type: 'url', url: image.links.url}">
+                          原图链接
+                        </el-dropdown-item>
+                        <el-input :model-value="image.links.url" size="small" readonly />
+                      </div>
+                      <div class="dropdown-item-with-input">
+                        <el-dropdown-item :command="{type: 'thumbnailUrl', url: image.links.thumbnailUrl}">
+                          缩略图链接
+                        </el-dropdown-item>
+                        <el-input :model-value="image.links.thumbnailUrl" size="small" readonly />
+                      </div>
+                      <div class="dropdown-item-with-input">
+                        <el-dropdown-item :command="{type: 'html', url: image.links.html}">
+                          HTML代码
+                        </el-dropdown-item>
+                        <el-input :model-value="image.links.html" size="small" readonly />
+                      </div>
+                      <div class="dropdown-item-with-input">
+                        <el-dropdown-item :command="{type: 'markdown', url: image.links.markdown}">
+                          Markdown
+                        </el-dropdown-item>
+                        <el-input :model-value="image.links.markdown" size="small" readonly />
+                      </div>
+                      <div class="dropdown-item-with-input">
+                        <el-dropdown-item :command="{type: 'bbcode', url: image.links.bbcode}">
+                          BBCode
+                        </el-dropdown-item>
+                        <el-input :model-value="image.links.bbcode" size="small" readonly />
+                      </div>
+                      <div class="dropdown-item-with-input">
+                        <el-dropdown-item :command="{type: 'markdownWithLink', url: image.links.markdownWithLink}">
+                          Markdown带链接
+                        </el-dropdown-item>
+                        <el-input :model-value="image.links.markdownWithLink" size="small" readonly />
+                      </div>
                     </el-dropdown-menu>
                   </template>
                 </el-dropdown>
@@ -226,7 +244,7 @@
       </template>
     </el-dialog>
 
-    <!-- 详细信息对话框 -->
+    <!-- 详信息对话框 -->
     <el-dialog
       v-model="detailsDialogVisible"
       title="图片详细信息"
@@ -236,8 +254,8 @@
         <div class="details-container">
           <div class="detail-preview">
             <el-image
-              :src="currentImage.links.thumbnailUrl"
-              :preview-src-list="[currentImage.links.url]"
+              :src="convertToProxyUrl(currentImage?.links.thumbnailUrl)"
+              :preview-src-list="convertUrlsToProxy([currentImage?.links.url])"
               fit="contain"
               class="preview-image"
             />
@@ -315,7 +333,7 @@
         <el-form-item label="用户名" v-if="hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')">
           <el-input 
             v-model="filterCondition.upload_user" 
-            placeholder="请输入上传者用户名" 
+            placeholder="请输入上传者用名" 
             clearable 
           />
         </el-form-item>
@@ -380,6 +398,7 @@ import request from '@/utils/request'
 import { useClipboard } from '@vueuse/core'
 import { image, album, hasAnyRole } from '@/api'
 import { useRoute } from 'vue-router'
+import { convertToProxyUrl, convertUrlsToProxy } from '@/utils/proxyUrl'
 
 export default {
   name: 'ImageManagement',
@@ -497,6 +516,7 @@ export default {
         }[command.type]
         ElMessage.success(`${typeText} 已复制到剪贴板`)
       } catch (error) {
+        console.error('Copy failed:', error)
         ElMessage.error('复制失败')
       }
     }
@@ -653,7 +673,7 @@ export default {
       }
     }
 
-    // 在对话框关闭时清除相册信息
+    // 在对话框闭时清除相册信息
     watch(detailsDialogVisible, (val) => {
       if (!val) {
         albumInfo.value = null
@@ -721,7 +741,9 @@ export default {
       handleLinkAlbum,
       albumInfo,
       hasAnyRole,
-      handlePublicStatusChange
+      handlePublicStatusChange,
+      convertToProxyUrl,
+      convertUrlsToProxy
     }
   }
 }
@@ -1029,5 +1051,33 @@ export default {
 
 :deep(.el-select) {
   width: 100%;
+}
+
+.dropdown-item-with-input {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+}
+
+.dropdown-item-with-input:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item-with-input :deep(.el-dropdown-menu__item) {
+  padding: 0 0 8px 0;
+  min-width: auto;
+}
+
+.dropdown-item-with-input :deep(.el-input) {
+  width: 300px;
+}
+
+.dropdown-item-with-input :deep(.el-input__wrapper) {
+  padding: 0 8px;
+}
+
+.dropdown-item-with-input :deep(.el-input__inner) {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+  font-family: monospace;
 }
 </style> 

@@ -19,7 +19,37 @@
 
         <h3>存储配置</h3>
         <el-form-item label="服务访问地址">
-          <el-input v-model="form.serverUrl" placeholder="例如：https://img.example.com/" />
+          <div class="server-url-input">
+            <el-input 
+              v-model="form.serverUrl" 
+              placeholder="例如：https://img.example.com/"
+            >
+              <template #append>
+                <el-tooltip 
+                  content="如果通过反向代理访问，请手动填写实际访问的域名地址" 
+                  placement="top"
+                >
+                  <el-icon><InfoFilled /></el-icon>
+                </el-tooltip>
+              </template>
+            </el-input>
+            <el-button @click="detectServerUrl">
+              使用当前地址
+            </el-button>
+          </div>
+          <div class="url-tip" style="margin-left: -180px">
+            <div class="current-url">
+              <span class="label">当前访问地址:</span>
+              <span class="url-value">{{ currentUrl }}</span>
+            </div>
+            <el-alert
+              type="warning"
+              :closable="false"
+              show-icon
+            >
+              如果您通过反向代理访问（如 Nginx），请填写实际对外访问的地址，而不是内部地址
+            </el-alert>
+          </div>
         </el-form-item>
         
         <h3>上传限制</h3>
@@ -83,9 +113,10 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { InfoFilled } from '@element-plus/icons-vue'
 import { init } from '@/api'
 
 const router = useRouter()
@@ -105,6 +136,42 @@ const form = reactive({
   adminUsername: 'admin',
   adminPassword: 'admin',
   adminEmail: 'admin@local.host'
+})
+
+// 获取当前访问地址
+const currentUrl = ref('')
+
+// 检测当前访问地址
+const detectCurrentUrl = () => {
+  const location = window.location
+  const protocol = location.protocol
+  const hostname = location.hostname
+  const port = location.port
+  
+  // 构建基础URL
+  let baseUrl = `${protocol}//${hostname}`
+  if (port && port !== '80' && port !== '443') {
+    baseUrl += `:${port}`
+  }
+  
+  // 如果有上下文路径，也加上
+  const pathname = location.pathname.split('/').filter(Boolean)[0]
+  if (pathname) {
+    baseUrl += `/${pathname}`
+  }
+  
+  baseUrl += '/'
+  currentUrl.value = baseUrl
+  return baseUrl
+}
+
+// 使用当前地址
+const detectServerUrl = () => {
+  form.serverUrl = detectCurrentUrl()
+}
+
+onMounted(() => {
+  detectCurrentUrl()
 })
 
 const handleSubmit = async () => {
@@ -162,5 +229,55 @@ h3 {
 
 .el-icon {
   cursor: help;
+}
+
+.server-url-input {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.url-tip {
+  font-size: 13px;
+  color: #606266;
+  margin-top: 8px;
+  width: calc(100% + 180px);
+  padding: 0;
+}
+
+:deep(.el-alert) {
+  margin-top: 8px;
+  padding: 8px 12px;
+}
+
+:deep(.el-alert__content) {
+  padding: 0 8px;
+}
+
+.current-url {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  margin-bottom: 8px;
+  padding: 0 0 0 180px;
+}
+
+.current-url .label {
+  width: 180px;
+  margin-left: -180px;
+  text-align: right;
+  padding-right: 12px;
+}
+
+.url-value {
+  flex: 1;
+  color: #303133;
+  font-family: monospace;
+  background-color: #f5f7fa;
+  padding: 4px 8px;
+  border-radius: 4px;
+  height: 32px;
+  line-height: 24px;
+  box-sizing: border-box;
 }
 </style> 
