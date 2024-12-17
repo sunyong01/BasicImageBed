@@ -79,17 +79,18 @@
             <el-option label="FTP" value="FTP" />
             <el-option label="SFTP" value="SFTP" />
             <el-option label="WebDAV" value="WEBDAV" />
-            <el-option label="华为云 OBS" value="HUAWEI_OBS" />
+            <el-option label="Amazon S3" value="S3" />
+            <el-option label="MinIO" value="MINIO" />
             <el-option label="阿里云 OSS" value="ALIYUN_OSS" />
-            <el-option label="七牛云 Kodo" value="QINIU_KODO" />
+            <el-option label="华为云 OBS" value="HUAWEI_OBS" />
             <el-option label="腾讯云 COS" value="TENCENT_COS" />
             <el-option label="百度云 BOS" value="BAIDU_BOS" />
             <el-option label="又拍云 USS" value="USS" />
-            <el-option label="MinIO" value="MINIO" />
-            <el-option label="Amazon S3" value="AMAZON_S3" />
+            <el-option label="七牛云 Kodo" value="KODO" />
             <el-option label="Google Cloud Storage" value="GOOGLE_CLOUD_STORAGE" />
             <el-option label="FastDFS" value="FASTDFS" />
             <el-option label="Azure Blob Storage" value="AZURE_BLOB_STORAGE" />
+            <el-option label="其他兼容S3的云存储" value="OTHER_S3_COMPATIBLE" />
           </el-select>
         </el-form-item>
 
@@ -109,13 +110,14 @@
         <template v-else-if="[
           'ALIYUN_OSS', 
           'HUAWEI_OBS', 
-          'QINIU_KODO', 
+          'KODO', 
           'TENCENT_COS', 
           'BAIDU_BOS', 
           'MINIO', 
-          'AMAZON_S3',
+          'S3',
           'GOOGLE_CLOUD_STORAGE',
-          'AZURE_BLOB_STORAGE'
+          'AZURE_BLOB_STORAGE',
+          'OTHER_S3_COMPATIBLE'
         ].includes(form.type)">
           <el-form-item label="AccessKey" prop="accessKeyId">
             <el-input v-model="form.accessKeyId" placeholder="请输入AccessKey" />
@@ -126,32 +128,15 @@
           <el-form-item label="Bucket" prop="bucketName">
             <el-input v-model="form.bucketName" placeholder="请输入Bucket名称" />
           </el-form-item>
-          <el-form-item label="Endpoint" prop="endpoint" 
-            v-if="['ALIYUN_OSS', 'HUAWEI_OBS', 'BAIDU_BOS', 'MINIO'].includes(form.type)">
-            <el-input v-model="form.endpoint" placeholder="请输入Endpoint" />
-          </el-form-item>
-          <el-form-item label="Region" prop="region" 
-            v-if="['TENCENT_COS', 'AMAZON_S3', 'GOOGLE_CLOUD_STORAGE'].includes(form.type)">
+          <el-form-item label="Region" prop="region">
             <el-input v-model="form.region" placeholder="请输入区域" />
           </el-form-item>
-          <!-- Google Cloud Storage 特有配置 -->
-          <template v-if="form.type === 'GOOGLE_CLOUD_STORAGE'">
-            <el-form-item label="项目ID" prop="projectId">
-              <el-input v-model="form.projectId" placeholder="请输入项目ID" />
-            </el-form-item>
-            <el-form-item label="凭证文件路径" prop="credentialsPath">
-              <el-input v-model="form.credentialsPath" placeholder="请输入凭证文件路径" />
-            </el-form-item>
-          </template>
-          <!-- Azure Blob Storage 特有配置 -->
-          <template v-if="form.type === 'AZURE_BLOB_STORAGE'">
-            <el-form-item label="连接字符串" prop="connectionString">
-              <el-input v-model="form.connectionString" type="password" placeholder="请输入连接字符串" show-password />
-            </el-form-item>
-            <el-form-item label="容器名称" prop="containerName">
-              <el-input v-model="form.containerName" placeholder="请输入容器名称" />
-            </el-form-item>
-          </template>
+          <el-form-item label="Endpoint" prop="endpoint">
+            <el-input v-model="form.endpoint" placeholder="请输入Endpoint" />
+          </el-form-item>
+          <el-form-item label="Domain" prop="domain">
+            <el-input v-model="form.domain" placeholder="请输入域名" />
+          </el-form-item>
         </template>
 
         <!-- FTP/SFTP配置 -->
@@ -169,7 +154,7 @@
             <el-input v-model="form.password" type="password" placeholder="请输入密码" show-password />
           </el-form-item>
           <el-form-item label="私钥路径" prop="privateKeyPath" v-if="form.type === 'SFTP'">
-            <el-input v-model="form.privateKeyPath" placeholder="请输入私钥路径（可选）" />
+            <el-input v-model="form.privateKeyPath" placeholder="请输入私钥路径（可" />
           </el-form-item>
         </template>
 
@@ -288,7 +273,8 @@ export default {
       username: '',
       password: '',
       privateKeyPath: '',
-      server: ''
+      server: '',
+      domain: ''
     })
 
     const rules = {
@@ -338,6 +324,34 @@ export default {
       ],
       sortOrder: [
         { required: true, message: '请输入排序顺序', trigger: 'blur' }
+      ],
+      region: [
+        { 
+          validator: (rule, value, callback) => {
+            if (form.type === 'S3' || form.type === 'OTHER_S3_COMPATIBLE') {
+              if (!value && !form.endpoint) {
+                callback(new Error('Region与Endpoint至少填写一个'))
+                return
+              }
+            }
+            callback()
+          },
+          trigger: 'blur'
+        }
+      ],
+      endpoint: [
+        {
+          validator: (rule, value, callback) => {
+            if (form.type === 'S3' || form.type === 'OTHER_S3_COMPATIBLE') {
+              if (!value && !form.region) {
+                callback(new Error('Region与Endpoint至少填写一个'))
+                return
+              }
+            }
+            callback()
+          },
+          trigger: 'blur'
+        }
       ]
     }
 
@@ -382,7 +396,8 @@ export default {
         username: '',
         password: '',
         privateKeyPath: '',
-        server: ''
+        server: '',
+        domain: ''
       })
       capacityValue.value = 0
       capacityUnit.value = 'MB'
@@ -407,14 +422,82 @@ export default {
           form.storagePath = config['storage-path']
           form.basePath = config['base-path']
           break
+        case 'FTP':
+          form.host = config['host']
+          form.port = parseInt(config['port'])
+          form.username = config['username']
+          form.password = config['password']
+          form.basePath = config['base-path']
+          break
+        case 'SFTP':
+          form.host = config['host']
+          form.port = parseInt(config['port'])
+          form.username = config['username']
+          form.password = config['password']
+          form.privateKeyPath = config['private-key-path']
+          form.basePath = config['base-path']
+          break
+        case 'WEBDAV':
+          form.server = config['server']
+          form.username = config['username']
+          form.password = config['password']
+          form.basePath = config['base-path']
+          break
+        case 'TENCENT_COS':
+          form.accessKeyId = config['secret-id']
+          form.accessKeySecret = config['secret-key']
+          form.region = config['region']
+          form.bucketName = config['bucket-name']
+          form.basePath = config['base-path']
+          break
         case 'ALIYUN_OSS':
+        case 'MINIO':
+        case 'HUAWEI_OBS':
+        case 'BAIDU_BOS':
           form.accessKeyId = config['access-key-id']
           form.accessKeySecret = config['access-key-secret']
           form.endpoint = config['endpoint']
           form.bucketName = config['bucket-name']
           form.basePath = config['base-path']
           break
-        // ... 其他类型的处理 ...
+        case 'S3':
+        case 'OTHER_S3_COMPATIBLE':
+          form.accessKeyId = config['access-key-id']
+          form.accessKeySecret = config['access-key-secret']
+          form.region = config['region']
+          form.endpoint = config['endpoint']
+          form.domain = config['domain']
+          form.bucketName = config['bucket-name']
+          form.basePath = config['base-path']
+          break
+        case 'USS':
+          form.username = config['username']
+          form.password = config['password']
+          form.bucketName = config['bucket-name']
+          form.basePath = config['base-path']
+          break
+        case 'KODO':
+          form.accessKeyId = config['access-key-id']
+          form.accessKeySecret = config['access-key-secret']
+          form.bucketName = config['bucket-name']
+          form.basePath = config['base-path']
+          break
+        case 'GOOGLE_CLOUD_STORAGE':
+          form.projectId = config['project-id']
+          form.credentialsPath = config['credential-file-path']
+          form.bucketName = config['bucket-name']
+          form.basePath = config['base-path']
+          break
+        case 'FASTDFS':
+          form.trackerServerHost = config['tracker-server-host']
+          form.trackerServerHttpPort = parseInt(config['tracker-server-http-port'])
+          form.basePath = config['base-path']
+          break
+        case 'AZURE_BLOB_STORAGE':
+          form.connectionString = config['connection-string']
+          form.containerName = config['container-name']
+          form.basePath = config['base-path']
+          break
       }
       
       // 处理容量显示
@@ -461,11 +544,12 @@ export default {
         }
       ).then(async () => {
         try {
-          // TODO: 调用删除接口
+          // 调用删除接口
+          await strategy.delete(row.id)
           ElMessage.success('删除成功')
           fetchStorageList()
         } catch (error) {
-          ElMessage.error('删除失败')
+          ElMessage.error(error.response?.data?.message || '删除失败')
         }
       })
     }
@@ -518,7 +602,7 @@ export default {
           }
           break
 
-        case 'QINIU_KODO':
+        case 'KODO':
           configJson = {
             'platform-name': formData.strategyName,
             'access-key-id': formData.accessKeyId,
@@ -568,6 +652,80 @@ export default {
             'server': formData.server,
             'username': formData.username,
             'password': formData.password,
+            'base-path': formData.basePath
+          }
+          break
+
+        case 'HUAWEI_OBS':
+          configJson = {
+            'platform-name': formData.strategyName,
+            'access-key-id': formData.accessKeyId,
+            'access-key-secret': formData.accessKeySecret,
+            'endpoint': formData.endpoint,
+            'bucket-name': formData.bucketName,
+            'base-path': formData.basePath
+          }
+          break
+
+        case 'BAIDU_BOS':
+          configJson = {
+            'platform-name': formData.strategyName,
+            'access-key-id': formData.accessKeyId,
+            'access-key-secret': formData.accessKeySecret,
+            'endpoint': formData.endpoint,
+            'bucket-name': formData.bucketName,
+            'base-path': formData.basePath
+          }
+          break
+
+        case 'USS':
+          configJson = {
+            'platform-name': formData.strategyName,
+            'username': formData.username,
+            'password': formData.password,
+            'bucket-name': formData.bucketName,
+            'base-path': formData.basePath
+          }
+          break
+
+        case 'S3':
+        case 'OTHER_S3_COMPATIBLE':
+          configJson = {
+            'platform-name': formData.strategyName,
+            'access-key-id': formData.accessKeyId,
+            'access-key-secret': formData.accessKeySecret,
+            'region': formData.region,
+            'endpoint': formData.endpoint,
+            'domain': formData.domain,
+            'bucket-name': formData.bucketName,
+            'base-path': formData.basePath
+          }
+          break
+
+        case 'GOOGLE_CLOUD_STORAGE':
+          configJson = {
+            'platform-name': formData.strategyName,
+            'project-id': formData.projectId,
+            'credential-file-path': formData.credentialsPath,
+            'bucket-name': formData.bucketName,
+            'base-path': formData.basePath
+          }
+          break
+
+        case 'FASTDFS':
+          configJson = {
+            'platform-name': formData.strategyName,
+            'tracker-server-host': formData.trackerServerHost,
+            'tracker-server-http-port': formData.trackerServerHttpPort,
+            'base-path': formData.basePath
+          }
+          break
+
+        case 'AZURE_BLOB_STORAGE':
+          configJson = {
+            'platform-name': formData.strategyName,
+            'connection-string': formData.connectionString,
+            'container-name': formData.containerName,
             'base-path': formData.basePath
           }
           break
@@ -676,10 +834,6 @@ export default {
   gap: 12px;
 }
 
-:deep(.el-switch) {
-  margin-right: 8px;
-}
-
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
@@ -692,7 +846,4 @@ export default {
   align-items: center;
 }
 
-:deep(.el-input-number) {
-  flex: 1;
-}
-</style> 
+</style>

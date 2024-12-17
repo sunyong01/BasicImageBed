@@ -9,6 +9,7 @@ import org.dromara.x.file.storage.core.platform.FileStorage;
 import web.sy.storage.strategy.config.ConfigFactories.*;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +22,7 @@ public enum StrategyConfigBuilderEnum {
     @Schema(description = "本地存储")
     LOCAL(1, LocalFileStorageFactory::new) {
         @Override
-        public List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs) {
+        public List<? extends FileStorage> buildSpecificFileStorage(FileStorageProperties.BaseConfig configs) {
             return FileStorageServiceBuilder.buildLocalPlusFileStorage(Collections.singletonList((FileStorageProperties.LocalPlusConfig) configs));
         }
     },
@@ -29,39 +30,40 @@ public enum StrategyConfigBuilderEnum {
     @Schema(description = "FTP")
     FTP(2, FtpConfigFactory::new) {
         @Override
-        public List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs) {
-            return FileStorageServiceBuilder.buildFtpFileStorage(Collections.singletonList((FileStorageProperties.FtpConfig) configs), null);
+        public List<? extends FileStorage> buildSpecificFileStorage(FileStorageProperties.BaseConfig config) {
+            return FileStorageServiceBuilder.buildFtpFileStorage(Collections.singletonList((FileStorageProperties.FtpConfig) config), null);
         }
     },
 
     @Schema(description = "SFTP")
     SFTP(3, SftpConfigFactory::new) {
         @Override
-        public List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs) {
-            return FileStorageServiceBuilder.buildSftpFileStorage(Collections.singletonList((FileStorageProperties.SftpConfig) configs), null);
+        public List<? extends FileStorage> buildSpecificFileStorage(FileStorageProperties.BaseConfig config) {
+            return FileStorageServiceBuilder.buildSftpFileStorage(Collections.singletonList((FileStorageProperties.SftpConfig) config), null);
         }
     },
+
 
     @Schema(description = "WebDav")
     WEBDAV(4, WebDavConfigFactory::new) {
         @Override
-        public List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs) {
-            return FileStorageServiceBuilder.buildWebDavFileStorage(Collections.singletonList((FileStorageProperties.WebDavConfig) configs), null);
+        public List<? extends FileStorage> buildSpecificFileStorage(FileStorageProperties.BaseConfig config) {
+            return FileStorageServiceBuilder.buildWebDavFileStorage(Collections.singletonList((FileStorageProperties.WebDavConfig) config), null);
         }
     },
 
     @Schema(description = "Amazon S3")
     S3(5, AmazonS3ConfigFactory::new) {
         @Override
-        public List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs) {
-            return FileStorageServiceBuilder.buildAmazonS3FileStorage(Collections.singletonList((FileStorageProperties.AmazonS3Config) configs), null);
+        public List<? extends FileStorage> buildSpecificFileStorage(FileStorageProperties.BaseConfig config) {
+            return FileStorageServiceBuilder.buildAmazonS3FileStorage(Collections.singletonList((FileStorageProperties.AmazonS3Config) config), null);
         }
     },
 
     @Schema(description = "Minio")
     MINIO(6, MinioConfigFactory::new) {
         @Override
-        public List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs) {
+        public List<? extends FileStorage> buildSpecificFileStorage(FileStorageProperties.BaseConfig configs) {
             return FileStorageServiceBuilder.buildMinioFileStorage(Collections.singletonList((FileStorageProperties.MinioConfig) configs), null);
         }
     },
@@ -69,7 +71,7 @@ public enum StrategyConfigBuilderEnum {
     @Schema(description = "阿里云OSS")
     ALIYUN_OSS(7, AliyunOssConfigFactory::new) {
         @Override
-        public List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs) {
+        public List<? extends FileStorage> buildSpecificFileStorage(FileStorageProperties.BaseConfig configs) {
             return FileStorageServiceBuilder.buildAliyunOssFileStorage(Collections.singletonList((FileStorageProperties.AliyunOssConfig) configs), null);
         }
     },
@@ -77,7 +79,7 @@ public enum StrategyConfigBuilderEnum {
     @Schema(description = "华为云OBS")
     HUAWEI_OBS(8, HuaweiObsConfigFactory::new) {
         @Override
-        public List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs) {
+        public List<? extends FileStorage> buildSpecificFileStorage(FileStorageProperties.BaseConfig configs) {
             return FileStorageServiceBuilder.buildHuaweiObsFileStorage(Collections.singletonList((FileStorageProperties.HuaweiObsConfig) configs), null);
         }
     },
@@ -85,7 +87,7 @@ public enum StrategyConfigBuilderEnum {
     @Schema(description = "腾讯云COS")
     TENCENT_COS(9, TencentCosConfigFactory::new) {
         @Override
-        public List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs) {
+        public List<? extends FileStorage> buildSpecificFileStorage(FileStorageProperties.BaseConfig configs) {
             return FileStorageServiceBuilder.buildTencentCosFileStorage(Collections.singletonList((FileStorageProperties.TencentCosConfig) configs), null);
         }
     },
@@ -93,7 +95,7 @@ public enum StrategyConfigBuilderEnum {
     @Schema(description = "百度云BOS")
     BAIDU_BOS(10, BaiduBosConfigFactory::new) {
         @Override
-        public List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs) {
+        public List<? extends FileStorage> buildSpecificFileStorage(FileStorageProperties.BaseConfig configs) {
             return FileStorageServiceBuilder.buildBaiduBosFileStorage(Collections.singletonList((FileStorageProperties.BaiduBosConfig) configs), null);
         }
     },
@@ -101,7 +103,7 @@ public enum StrategyConfigBuilderEnum {
     @Schema(description = "又拍云 USS")
     USS(11, UpyunUssConfigFactory::new) {
         @Override
-        public List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs) {
+        public List<? extends FileStorage> buildSpecificFileStorage(FileStorageProperties.BaseConfig configs) {
             return FileStorageServiceBuilder.buildUpyunUssFileStorage(Collections.singletonList((FileStorageProperties.UpyunUssConfig) configs), null);
         }
     },
@@ -109,7 +111,7 @@ public enum StrategyConfigBuilderEnum {
     @Schema(description = "七牛云 Kodo")
     KODO(12, QiniuKodoConfigFactory::new) {
         @Override
-        public List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs) {
+        public List<? extends FileStorage> buildSpecificFileStorage(FileStorageProperties.BaseConfig configs) {
             return FileStorageServiceBuilder.buildQiniuKodoFileStorage(Collections.singletonList((FileStorageProperties.QiniuKodoConfig) configs), null);
         }
     },
@@ -117,7 +119,7 @@ public enum StrategyConfigBuilderEnum {
     @Schema(description = "Google Cloud Storage")
     GOOGLE_CLOUD_STORAGE(13, GoogleCloudStorageConfigFactory::new) {
         @Override
-        public List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs) {
+        public List<? extends FileStorage> buildSpecificFileStorage(FileStorageProperties.BaseConfig configs) {
             return FileStorageServiceBuilder.buildGoogleCloudStorageFileStorage(Collections.singletonList((FileStorageProperties.GoogleCloudStorageConfig) configs), null);
         }
     },
@@ -125,7 +127,7 @@ public enum StrategyConfigBuilderEnum {
     @Schema(description = "FastDFS")
     FASTDFS(14, FastDfsConfigFactory::new) {
         @Override
-        public List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs) {
+        public List<? extends FileStorage> buildSpecificFileStorage(FileStorageProperties.BaseConfig configs) {
             // 这里被封装为私有方法，那没有办法 只能反射了
             try {
                 Method method = FileStorageServiceBuilder.class.getDeclaredMethod("buildFastDfsFileStorage", List.class, String.class);
@@ -142,8 +144,16 @@ public enum StrategyConfigBuilderEnum {
     @Schema(description = "Azure Blob Storage")
     AZURE_BLOB_STORAGE(15, AzureBlobStorageConfigFactory::new) {
         @Override
-        public List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs) {
+        public List<? extends FileStorage> buildSpecificFileStorage(FileStorageProperties.BaseConfig configs) {
             return FileStorageServiceBuilder.buildAzureBlobFileStorage(Collections.singletonList((FileStorageProperties.AzureBlobStorageConfig) configs), null);
+        }
+    },
+
+    @Schema(description = "Amazon S3 Compatible")
+    OTHER_S3_COMPATIBLE(16, AmazonS3ConfigFactory::new) {
+        @Override
+        public List<? extends FileStorage> buildSpecificFileStorage(FileStorageProperties.BaseConfig configs) {
+            return FileStorageServiceBuilder.buildAmazonS3FileStorage(Collections.singletonList((FileStorageProperties.AmazonS3Config) configs), null);
         }
     };
 
@@ -170,14 +180,18 @@ public enum StrategyConfigBuilderEnum {
         return (T) factory.getConfig(config);
     }
 
-    public abstract List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs);
+    public abstract List<? extends FileStorage> buildSpecificFileStorage(FileStorageProperties.BaseConfig config);
 
     public static List<? extends FileStorage> getFileStorage(Integer type, HashMap<String, String> config) {
         StrategyConfigBuilderEnum builderEnum = StrategyConfigBuilderEnum.getByCode(type);
         if (builderEnum == null) {
             throw new IllegalArgumentException("不支持的存储类型");
         }
-         return builderEnum.buildSpecificFileStorage(builderEnum.getConfig(config));
+        // 获取配置对象
+        FileStorageProperties.BaseConfig config1 = builderEnum.getConfig(config);
+
+        // 传递单个配置对象而不是列表
+        return builderEnum.buildSpecificFileStorage(config1);
     }
 
 }

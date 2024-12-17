@@ -4,7 +4,7 @@
 重写的图床服务，实现了与兰空图床在 [API](https://github.com/lsky-org/lsky-pro/blob/911275c13b038c7a8b710de44664f23887eeb6f6/resources/views/common/api.blade.php#L9)
 上相同的功能，同时 100% 兼容了 Halo 博客的 [Lsky Pro 插件](https://github.com/ichenhe/halo-lsky-pro#readme)。
 
-你可以根据 `Dockerfile` 快速启动一个图床服务。
+你可以根据 `Dockerfile-Compose` 快速启动一个图床服务。
 
  需要Mysql环境
 
@@ -20,7 +20,7 @@
 ## 注意
 
 1. **HTTPS 配置**：如果博客使用了 HTTPS，则图床也需要使用 HTTPS，否则浏览器会在前端拦截。
-2. **域名配置**：请在配置文件中配置博客的服务器域名地址，否则无法使用。域名地址类似于这样：`https://static.blogdomain.com`
+2. **域名配置**：请在系统初始化或系统配置中填写博客的服务器域名地址，否则无法使用。域名地址类似于这样：`https://static.blogdomain.com`
 3. **挂载磁盘**： 请修改docker-compose.yml中的挂载路径和端口号。默认使用的路径为当前文件夹和28123端口
 
 ## 启动方法
