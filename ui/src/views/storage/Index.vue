@@ -677,10 +677,6 @@ export default {
   gap: 12px;
 }
 
-:deep(.el-switch) {
-  margin-right: 8px;
-}
-
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
@@ -693,7 +689,4 @@ export default {
   align-items: center;
 }
 
-:deep(.el-input-number) {
-  flex: 1;
-}
-</style> 
+</style>

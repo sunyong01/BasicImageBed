@@ -33,7 +33,7 @@
                 </div>
               </div>
             </div>
-            <div c  lass="switch-wrapper">
+            <div class="switch-wrapper">
               <span class="switch-label">图片域名代理</span>
               <el-switch
                 v-model="proxyEnabled"
@@ -142,7 +142,7 @@
 import { ref, computed, onMounted, reactive, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowDown, InfoFilled, Warning } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import Navigation from '../components/Navigation.vue'
 import { user, auth } from '@/api'
 import { convertToProxyUrl } from '@/utils/proxyUrl'
@@ -467,24 +467,9 @@ export default {
   color: #E6A23C;  /* 使用 Element Plus 的警告色 */
 }
 
-.switch-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-}
-
 .switch-label {
   font-size: 14px;
   color: #606266;
-}
-
-:deep(.el-switch) {
-  margin-right: 4px;
-}
-
-:deep(.el-tooltip__trigger) {
-  color: #909399;
 }
 
 .user-info {
@@ -518,15 +503,6 @@ export default {
   font-size: 14px;
   font-weight: 500;
   color: var(--el-text-color-primary);
-}
-
-:deep(.el-dropdown-menu__item--divided) {
-  margin-top: 0;
-  border-top: none;
-}
-
-:deep(.el-dropdown-menu__item.is-disabled) {
-  background-color: transparent;
 }
 
 .main-content {
