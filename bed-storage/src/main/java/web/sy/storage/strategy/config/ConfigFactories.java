@@ -84,7 +84,9 @@ public class ConfigFactories {
             s3Config.setPlatform(config.get("platform-name"));
             s3Config.setAccessKey(config.get("access-key-id"));
             s3Config.setSecretKey(config.get("access-key-secret"));
+            s3Config.setDomain(config.get("domain"));
             s3Config.setRegion(config.get("region"));
+            s3Config.setEndPoint(config.get("endpoint"));
             s3Config.setBucketName(config.get("bucket-name"));
             s3Config.setBasePath(config.get("base-path"));
             return s3Config;

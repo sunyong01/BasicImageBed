@@ -128,32 +128,15 @@
           <el-form-item label="Bucket" prop="bucketName">
             <el-input v-model="form.bucketName" placeholder="请输入Bucket名称" />
           </el-form-item>
-          <el-form-item label="Endpoint" prop="endpoint" 
-            v-if="['ALIYUN_OSS', 'HUAWEI_OBS', 'BAIDU_BOS', 'MINIO'].includes(form.type)">
-            <el-input v-model="form.endpoint" placeholder="请输入Endpoint" />
-          </el-form-item>
-          <el-form-item label="Region" prop="region" 
-            v-if="['TENCENT_COS', 'AMAZON_S3', 'GOOGLE_CLOUD_STORAGE'].includes(form.type)">
+          <el-form-item label="Region" prop="region">
             <el-input v-model="form.region" placeholder="请输入区域" />
           </el-form-item>
-          <!-- Google Cloud Storage 特有配置 -->
-          <template v-if="form.type === 'GOOGLE_CLOUD_STORAGE'">
-            <el-form-item label="项目ID" prop="projectId">
-              <el-input v-model="form.projectId" placeholder="请输入项目ID" />
-            </el-form-item>
-            <el-form-item label="凭证文件路径" prop="credentialsPath">
-              <el-input v-model="form.credentialsPath" placeholder="请输入凭证文件路径" />
-            </el-form-item>
-          </template>
-          <!-- Azure Blob Storage 特有配置 -->
-          <template v-if="form.type === 'AZURE_BLOB_STORAGE'">
-            <el-form-item label="连接字符串" prop="connectionString">
-              <el-input v-model="form.connectionString" type="password" placeholder="请输入连接字符串" show-password />
-            </el-form-item>
-            <el-form-item label="容器名称" prop="containerName">
-              <el-input v-model="form.containerName" placeholder="请输入容器名称" />
-            </el-form-item>
-          </template>
+          <el-form-item label="Endpoint" prop="endpoint">
+            <el-input v-model="form.endpoint" placeholder="请输入Endpoint" />
+          </el-form-item>
+          <el-form-item label="Domain" prop="domain">
+            <el-input v-model="form.domain" placeholder="请输入域名" />
+          </el-form-item>
         </template>
 
         <!-- FTP/SFTP配置 -->
@@ -171,7 +154,7 @@
             <el-input v-model="form.password" type="password" placeholder="请输入密码" show-password />
           </el-form-item>
           <el-form-item label="私钥路径" prop="privateKeyPath" v-if="form.type === 'SFTP'">
-            <el-input v-model="form.privateKeyPath" placeholder="请输入私钥路径（可��" />
+            <el-input v-model="form.privateKeyPath" placeholder="请输入私钥路径（可" />
           </el-form-item>
         </template>
 
@@ -290,7 +273,8 @@ export default {
       username: '',
       password: '',
       privateKeyPath: '',
-      server: ''
+      server: '',
+      domain: ''
     })
 
     const rules = {
@@ -340,6 +324,34 @@ export default {
       ],
       sortOrder: [
         { required: true, message: '请输入排序顺序', trigger: 'blur' }
+      ],
+      region: [
+        { 
+          validator: (rule, value, callback) => {
+            if (form.type === 'S3' || form.type === 'OTHER_S3_COMPATIBLE') {
+              if (!value && !form.endpoint) {
+                callback(new Error('Region与Endpoint至少填写一个'))
+                return
+              }
+            }
+            callback()
+          },
+          trigger: 'blur'
+        }
+      ],
+      endpoint: [
+        {
+          validator: (rule, value, callback) => {
+            if (form.type === 'S3' || form.type === 'OTHER_S3_COMPATIBLE') {
+              if (!value && !form.region) {
+                callback(new Error('Region与Endpoint至少填写一个'))
+                return
+              }
+            }
+            callback()
+          },
+          trigger: 'blur'
+        }
       ]
     }
 
@@ -384,7 +396,8 @@ export default {
         username: '',
         password: '',
         privateKeyPath: '',
-        server: ''
+        server: '',
+        domain: ''
       })
       capacityValue.value = 0
       capacityUnit.value = 'MB'
@@ -452,6 +465,8 @@ export default {
           form.accessKeyId = config['access-key-id']
           form.accessKeySecret = config['access-key-secret']
           form.region = config['region']
+          form.endpoint = config['endpoint']
+          form.domain = config['domain']
           form.bucketName = config['bucket-name']
           form.basePath = config['base-path']
           break
@@ -680,6 +695,8 @@ export default {
             'access-key-id': formData.accessKeyId,
             'access-key-secret': formData.accessKeySecret,
             'region': formData.region,
+            'endpoint': formData.endpoint,
+            'domain': formData.domain,
             'bucket-name': formData.bucketName,
             'base-path': formData.basePath
           }
