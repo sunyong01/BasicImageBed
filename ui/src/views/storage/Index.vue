@@ -461,11 +461,12 @@ export default {
         }
       ).then(async () => {
         try {
-          // TODO: 调用删除接口
+          // 调用删除接口
+          await strategy.delete(row.id)
           ElMessage.success('删除成功')
           fetchStorageList()
         } catch (error) {
-          ElMessage.error('删除失败')
+          ElMessage.error(error.response?.data?.message || '删除失败')
         }
       })
     }

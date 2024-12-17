@@ -33,7 +33,7 @@
                 </div>
               </div>
             </div>
-            <div class="switch-wrapper">
+            <div c  lass="switch-wrapper">
               <span class="switch-label">图片域名代理</span>
               <el-switch
                 v-model="proxyEnabled"
