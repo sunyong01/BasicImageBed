@@ -145,6 +145,14 @@ public enum StrategyConfigBuilderEnum {
         public List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs) {
             return FileStorageServiceBuilder.buildAzureBlobFileStorage(Collections.singletonList((FileStorageProperties.AzureBlobStorageConfig) configs), null);
         }
+    },
+
+    @Schema(description = "Amazon S3 Compatible")
+    OTHER_S3_COMPATIBLE(16, AmazonS3ConfigFactory::new) {
+        @Override
+        public List<? extends FileStorage> buildSpecificFileStorage(List<? extends FileStorageProperties.BaseConfig> configs) {
+            return FileStorageServiceBuilder.buildAmazonS3FileStorage(Collections.singletonList((FileStorageProperties.AmazonS3Config) configs), null);
+        }
     };
 
     @Getter
